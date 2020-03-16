@@ -1,3 +1,6 @@
+// ssh -L 3306:db2.csse.canterbury.ac.nz:3306 jle147@linux.cosc.canterbury.ac.nz
+
+
 require('dotenv').config();
 const db = require('./config/db');
 const express = require('./config/express');
@@ -17,8 +20,8 @@ async function testDbConnection() {
 }
 
 testDbConnection()
-    .then(function () {
+    .then(function ()
         app.listen(port, function () {
             console.log(`Listening on port: ${port}`);
         });
-    });
+    );
