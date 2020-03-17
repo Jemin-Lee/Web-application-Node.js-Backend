@@ -20,8 +20,8 @@ async function testDbConnection() {
 }
 
 testDbConnection()
-    .then(function ()
+    .then(function () {
         app.listen(port, function () {
             console.log(`Listening on port: ${port}`);
         });
-    );
+    });
