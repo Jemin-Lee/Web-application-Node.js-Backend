@@ -1,6 +1,6 @@
 const db = require('../../config/db');
+const passwords = require('../service/password');
 const fs = require('mz/fs');
-const passwords = require('../password.encrypt');
 
 
 const photoDirectory = './storage/photos/';
@@ -41,8 +41,7 @@ exports.loadData = async function () {
  * @returns {Promise<void>}
  */
 async function populateDefaultUsers() {
-    const createSQL = `INSERT INTO User (name, email, password, city, country, photo_filename)
-                       VALUES ?`;
+    const createSQL = `INSERT INTO User (name, email, password, city, country, photo_filename) VALUES ?`;
     let {properties, usersData} = require('../resources/default_users');
 
     // Shallow copy all the user arrays within the main data array
@@ -61,10 +60,7 @@ async function populateDefaultUsers() {
 }
 
 async function changePasswordToHash(user, passwordIndex) {
-    // TODO you need to implement "passwords.hash()" yourself, then uncomment the line below.
     user[passwordIndex] = await passwords.hash(user[passwordIndex]);
-
-    // It is recommended you use a reputable cryptology library to do the actual hashing/comparing for you...
 }
 
 exports.executeSql = async function (sql) {
