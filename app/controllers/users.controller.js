@@ -52,7 +52,6 @@ exports.login = async function (req, res) {
         //compare password
         const passwordCorrect = await passwords.compare(req.body.password, searchedUser.password);
         if (passwordCorrect){
-
             try{
                 const result = await userModel.login(searchedUser.user_id);
                 res.statusMessage='OK';
@@ -71,4 +70,12 @@ exports.login = async function (req, res) {
     }
 
 
+};
+
+exports.login = async function (req, res) {
+    try{
+        userModel.findUserToken();
+    }catch(err){
+        return
+    }
 };
