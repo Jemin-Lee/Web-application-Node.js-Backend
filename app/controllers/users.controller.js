@@ -18,25 +18,14 @@ function checkEmpty(input){
 
 exports.register = async function (req, res) {
 
-    //checks if email has '@'
-    if (!checkEmail(req.body.email)) {
-        res.statusMessage = 'Invalid Email';
-        res.status(400).send();
-    }
-    //check password
-    if (!('password' in req.body) && (!checkEmpty(req.body.password))) {
-        res.statusMessage = 'Password Empty';
-        res.status(400).send();
-    }
-    //check name
-    if (!('name' in req.body) && (!checkEmpty(req.body.name))){
-        res.statusMessage = 'Name Empty';
+    if ( (!checkEmail(req.body.email)) || (!('password' in req.body) && (checkEmpty(req.body.password))) || (!('name' in req.body) && (checkEmpty(req.body.name))) ) {
+        console.log(1);
+        res.statusMessage = 'Bad Request';
         res.status(400).send();
     }else {
         try {
             const userId = await userModel.register(req.body);
-            res.status(201)
-                .json({userId});
+            res.status(201).json({userId});
         }catch(err){
             if (err.sqlMessage && err.sqlMessage.includes('Duplicate entry')){
                 res.statusMessage = 'Username or Email already exists';
