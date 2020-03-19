@@ -72,10 +72,5 @@ exports.login = async function (req, res) {
 
 };
 
-exports.login = async function (req, res) {
-    try{
-        userModel.findUserToken();
-    }catch(err){
-        return
-    }
+exports.logout = async function (req, res) {
 };

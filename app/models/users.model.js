@@ -38,12 +38,8 @@ exports.findUser = async function (email){
 
 };
 
-exports.logout = async function (userId){
-    const query = `update User set auth_token = null where user_id = ?`;
-    const conn = await db.getPool().getConnection();
-    await conn.query(query, userId);
-    conn.release();
-};
+exports.logout = async function (userId){};
+
 
 exports.findUserToken = async function (userToken){
     const query = `select user_id from User where auth_token = ?`;
