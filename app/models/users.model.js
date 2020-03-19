@@ -38,7 +38,16 @@ exports.findUser = async function (email){
 
 };
 
-exports.logout = async function (userId){};
+exports.logout = async function (userId){
+  const query = `update User set auth_token = null where user_id = ?`
+
+  try {
+    conn = await db.getpool().getConnection();
+    await conn.query(query, userId);
+  }catch(err){
+    throw err;
+  }
+};
 
 
 exports.findUserToken = async function (userToken){
@@ -47,10 +56,13 @@ exports.findUserToken = async function (userToken){
         const conn = await db.getPool().getConnection();
         const foundUserList = await conn.query(query, userToken);
         conn.release();
-        return foundUserList[0]
+        if (foundUserList.length == 0) {
+          return null;
+        }else{
+          return foundUserList[0];
+        }
+
     }catch(err){
-        return
+        throw err;
     }
-
-
 };
