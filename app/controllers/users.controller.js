@@ -1,19 +1,44 @@
 const userModel =  require('../models/users.model');
-const fs = require("fs");
 
 function checkEmail(email){
+    //email include @
     return email.includes('@')
 }
 
+function checkEmpty(input){
+    //input empty || only white-space || null
+    return !(input.length === 0 || !input.trim() || !input);
+}
+
+
 exports.register = async function (req, res) {
 
-    try {
-        const userId = await userModel.register(req.body);
-
-        res.status(200)
-            .json({userId})
-            .send('User created');
-    }catch(err){
-        throw err;
+    //checks if email has '@'
+    if (!checkEmail(req.body.email)) {
+        res.statusMessage = 'Invalid Email';
+        res.status(400).send();
+    }
+    //check password
+    if (!checkEmpty(req.body.password)) {
+        res.statusMessage = 'Password Empty';
+        res.status(400).send();
+    }
+    if (!checkEmpty(req.body.name)) {
+        res.statusMessage = 'Name Empty';
+        res.status(400).send();
+    }else {
+        try {
+            const userId = await userModel.register(req.body);
+            res.status(201)
+                .json({userId}).send('User created');
+        }catch(err){
+            if (err.sqlMessage && err.sqlMessage.includes('Duplicate entry')){
+                res.statusMessage = 'Username or Email already exists';
+                res.status(400).send();
+            }else{
+                res.statusMessage='Server Error';
+                res.status(500).send();
+            }
+        }
     }
 };
