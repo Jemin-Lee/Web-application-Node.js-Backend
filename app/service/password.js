@@ -5,6 +5,6 @@ exports.hash = async function (password) {
     return await bcrypt.hash(password, SALT_ROUNDS);
 };
 
-exports.compare = async function (data, hash) {
-    return await bcrypt.compare(data, hash);
+exports.compare = async function (reqData, foundData) {
+    return await bcrypt.compare(reqData, foundData);
 };
