@@ -31,7 +31,8 @@ exports.register = async function (req, res) {
     } else {
         try {
             const userId = await userModel.register(req.body);
-            res.status(201).json({userId});
+            res.status(201)
+                .json({userId});
         }catch(err){
             if (err.sqlMessage && err.sqlMessage.includes('Duplicate entry')){
                 res.statusMessage = 'Username or Email already exists';
