@@ -89,7 +89,7 @@ exports.logout = async function (req, res) {
 exports.retrieveDetail = async function (req, res) {
   try {
     const userInfo = await userModel.retrieveDetail(req.currentId, req.params.id);
-    
+
     if (!userInfo){
       res.statusMessage = 'Not Found';
       res.status(404).send();
