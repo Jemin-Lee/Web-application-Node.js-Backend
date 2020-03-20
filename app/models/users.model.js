@@ -52,11 +52,15 @@ exports.logout = async function (userId){
 
 exports.findUserToken = async function (userToken){
     const query = `select user_id from User where auth_token = ?`;
+    if (!userToken){
+      return null;
+    }
+
     try{
         const conn = await db.getPool().getConnection();
         const foundUserList = await conn.query(query, userToken);
         conn.release();
-        if (foundUserList.length == 0) {
+        if (!foundUserList[0].length) {
           return null;
         }else{
           return foundUserList[0];

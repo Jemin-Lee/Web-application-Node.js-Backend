@@ -5,9 +5,8 @@ exports.checkUserToken = async function (req, res, next) {
 
   try {
     const foundUserList = await userModel.findUserToken(userToken);
-
-    if (!foundUserList[0]) {
-      req.currentId = null;
+    if (!foundUserList) {
+      next();
     }else{
       req.currentId = foundUserList[0].user_id.toString();
       next();
