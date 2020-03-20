@@ -9,8 +9,8 @@ exports.register = async function (user) {
     const [result] = await conn.query(query, userData);
     conn.release();
     return result.insertId;
-
 };
+
 
 /*
 login
@@ -35,7 +35,7 @@ exports.findUser = async function (email){
         conn.release();
         return foundDataList[0]
     }catch(err){
-        return null
+        return null;
     }
 
 };
@@ -75,7 +75,19 @@ exports.findUserToken = async function (userToken){
     }
 };
 
-
 /*
 get user information
 */
+exports.retrieveDetail = async function (userId){
+  const query = `select name, email, city, country from User where user_id = ?`;
+
+  try{
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query(query, userId);
+    conn.release();
+    const userInfo = result[0];
+    return userInfo;
+  }catch(err){
+    return null;
+  }
+};

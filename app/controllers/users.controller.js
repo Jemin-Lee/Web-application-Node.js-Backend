@@ -31,8 +31,7 @@ exports.register = async function (req, res) {
     } else {
         try {
             const userId = await userModel.register(req.body);
-            res.status(201)
-                .json({userId});
+            res.status(201).json({userId});
         }catch(err){
             if (err.sqlMessage && err.sqlMessage.includes('Duplicate entry')){
                 res.statusMessage = 'Username or Email already exists';
@@ -83,7 +82,22 @@ exports.logout = async function (req, res) {
       res.status(200).send();
     }
   }catch(err){
-    console.log('here');
+    res.status(500).send();
+  }
+};
+
+exports.retrieveDetail = async function (req, res) {
+  const userId = req.currentId;
+  try {
+    if (!userId){
+      res.statusMessage = 'Not Found';
+      res.status(404).send();
+    } else{
+      const userData = await userModel.retrieveDetail(userId);
+      res.statusMessage = 'OK';
+      res.status(200).json({userData});
+    }
+  }catch(err){
     res.status(500).send();
   }
 };
