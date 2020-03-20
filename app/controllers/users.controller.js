@@ -95,7 +95,7 @@ exports.retrieveDetail = async function (req, res) {
     } else{
       const userData = await userModel.retrieveDetail(userId);
       res.statusMessage = 'OK';
-      res.status(200).json({userData});
+      res.status(200).json(userData);
     }
   }catch(err){
     res.status(500).send();
