@@ -87,15 +87,15 @@ exports.logout = async function (req, res) {
 };
 
 exports.retrieveDetail = async function (req, res) {
-  const userId = req.currentId;
   try {
-    if (!userId){
+    const userInfo = await userModel.retrieveDetail(req.currentId, req.params.id);
+    
+    if (!userInfo){
       res.statusMessage = 'Not Found';
       res.status(404).send();
-    } else{
-      const userData = await userModel.retrieveDetail(userId);
+    }else{
       res.statusMessage = 'OK';
-      res.status(200).json(userData);
+      res.status(200).json(userInfo);
     }
   }catch(err){
     res.status(500).send();

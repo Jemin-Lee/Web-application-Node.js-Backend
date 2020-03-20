@@ -75,18 +75,28 @@ exports.findUserToken = async function (userToken){
     }
 };
 
+
 /*
 get user information
 */
-exports.retrieveDetail = async function (userId){
+exports.retrieveDetail = async function (currentId, reqId){
   const query = `select name, email, city, country from User where user_id = ?`;
 
   try{
     const conn = await db.getPool().getConnection();
-    const [result] = await conn.query(query, userId);
+    const [result] = await conn.query(query, reqId);
     conn.release();
-    const userInfo = result[0];
-    return userInfo;
+
+    const userData = result[0];
+
+    if (!currentId){
+      return {
+        'name': userData.name,
+        'city': userData.city,
+        'country': userData.country
+      };
+    }
+    return userData;
   }catch(err){
     return null;
   }
