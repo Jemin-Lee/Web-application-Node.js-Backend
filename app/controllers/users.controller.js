@@ -75,7 +75,7 @@ exports.login = async function (req, res) {
 exports.logout = async function (req, res) {
   const userId = req.currentId;
   try {
-    if (!userId){
+    if (userId===null){
       res.statusMessage = 'Unauthorized';
       res.status(401).send();
     } else{
