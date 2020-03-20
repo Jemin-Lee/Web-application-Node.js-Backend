@@ -73,9 +73,9 @@ exports.login = async function (req, res) {
 };
 
 exports.logout = async function (req, res) {
-  
+  const userId = req.currentId;
   try {
-    if (req.currentId === null){
+    if (!userId){
       res.statusMessage = 'Unauthorized';
       res.status(401).send();
     } else{
@@ -84,6 +84,7 @@ exports.logout = async function (req, res) {
       res.status(200).send();
     }
   }catch(err){
+    console.log('here');
     res.status(500).send();
   }
 };
