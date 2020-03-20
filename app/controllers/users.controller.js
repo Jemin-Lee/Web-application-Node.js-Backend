@@ -73,6 +73,7 @@ exports.login = async function (req, res) {
 };
 
 exports.logout = async function (req, res) {
+  
   try {
     if (req.currentId === null){
       res.statusMessage = 'Unauthorized';

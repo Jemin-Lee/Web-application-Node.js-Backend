@@ -1,7 +1,8 @@
-const usersControll = require('../controllers/users.controller');
+const usersController = require('../controllers/users.controller');
+const authentication = require('../middleware/authentication');
 
 module.exports = function (app) {
-    app.route(app.rootUrl + '/users/register').post(usersControll.register);
-    app.route(app.rootUrl + '/users/login').post(usersControll.login);
-    app.route(app.rootUrl + '/users/logout').post(authentication.checkUserToken, usersControll.logout);
+    app.route(app.rootUrl + '/users/register').post(usersController.register);
+    app.route(app.rootUrl + '/users/login').post(usersController.login);
+    app.route(app.rootUrl + '/users/logout').post(authentication.checkUserToken, usersController.logout);
 };
