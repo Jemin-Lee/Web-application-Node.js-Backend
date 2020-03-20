@@ -15,7 +15,6 @@ function checkEmpty(input){
     }
 }
 
-
 exports.register = async function (req, res) {
 
     if ((!('email' in req.body)) || (!checkEmail(req.body.email))){

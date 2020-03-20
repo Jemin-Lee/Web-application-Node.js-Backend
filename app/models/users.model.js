@@ -12,6 +12,9 @@ exports.register = async function (user) {
 
 };
 
+/*
+login
+*/
 exports.login = async function (userId){
     const token = randomtoken.generate(32);
     const query = `update User set auth_token = ? where user_id = ?`;
@@ -23,7 +26,6 @@ exports.login = async function (userId){
     result = {'userId': userId, 'token': token};
     return result
 };
-
 exports.findUser = async function (email){
     try {
         const query = `select user_id, password from User where email = ?`;
@@ -38,6 +40,10 @@ exports.findUser = async function (email){
 
 };
 
+
+/*
+logout
+*/
 exports.logout = async function (userId){
   const query = `update User set auth_token = null where user_id = ?`
   try {
@@ -49,7 +55,6 @@ exports.logout = async function (userId){
     throw err;
   }
 };
-
 exports.findUserToken = async function (userToken){
     const query = `select user_id from User where auth_token = ?`;
     if (!userToken){
@@ -69,3 +74,8 @@ exports.findUserToken = async function (userToken){
         throw err;
     }
 };
+
+
+/*
+get user information
+*/
