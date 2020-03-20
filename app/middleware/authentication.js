@@ -1,6 +1,6 @@
 const userModel =  require('../models/users.model');
 
-exports.checkUserToken = async function (req, res, next) {
+exports.setToken = async function (req, res, next) {
   const userToken = req.header('X-Authorization');
 
   try {
