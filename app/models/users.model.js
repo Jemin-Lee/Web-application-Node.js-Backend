@@ -23,8 +23,10 @@ exports.login = async function (userId){
     const conn = await db.getPool().getConnection();
     await conn.query(query, userData);
     conn.release();
-    result = {'userId': userId, 'token': token};
-    return result
+    return {
+      'userId': userId,
+      'token': token
+    };
 };
 exports.findUser = async function (email){
     try {
@@ -37,7 +39,6 @@ exports.findUser = async function (email){
     }catch(err){
         return null;
     }
-
 };
 
 
@@ -60,7 +61,6 @@ exports.findUserToken = async function (userToken){
     if (!userToken){
       return null;
     }
-
     try{
         const conn = await db.getPool().getConnection();
         const foundUserList = await conn.query(query, userToken);
@@ -101,3 +101,23 @@ exports.retrieveDetail = async function (currentId, reqId){
     return null;
   }
 };
+
+
+/*Update user details
+
+exports.update =async function (changes, userId, currentPassword) {
+  const query = `update User set ? where user_id = ?`;
+
+  try {
+    if ('password' in changes &&){
+      changes.password = await passwords.hash(changes.password);
+    }
+
+    const conn = await db.getPool().getConnection();
+    await conn.query(query, changes, userId);
+  }catch(err){
+
+  }
+};
+
+*/

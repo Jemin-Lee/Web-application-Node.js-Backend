@@ -1,8 +1,8 @@
 const userModel =  require('../models/users.model');
 const passwords = require('../service/password');
 
+
 function checkEmail(email){
-    //email include @
     return email.includes('@')
 }
 
@@ -87,7 +87,7 @@ exports.logout = async function (req, res) {
 };
 
 exports.retrieveDetail = async function (req, res) {
-  try {
+  try{
     const userInfo = await userModel.retrieveDetail(req.currentId, req.params.id);
 
     if (!userInfo){
@@ -101,3 +101,41 @@ exports.retrieveDetail = async function (req, res) {
     res.status(500).send();
   }
 };
+
+/* Change Details
+
+exports.changeDetails = async function (req, res){
+  if ((!('email' in req.body)) || (!checkEmail(req.body.email))){
+      res.statusMessage = 'Bad Request';
+      res.status(400).send();
+  }
+  if ((!('name' in req.body)) || (!checkEmpty(req.body.name))) {
+      res.statusMessage = 'Bad Request';
+      res.status(400).send();
+  }
+  if (!Number.isInteger(parseInt(req.params.id) || parseInt(req.params.id) < 1)){
+    res.statusMessage = 'Bad Request'
+    res.status(400).send();
+  }
+  if (!checkEmpty(req.body.password) || ){
+      res.statusMessage = 'Forbidden';
+      res.status(403).send();
+  }
+  if(req.currentId !== req.params.id){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+  }
+  if (!await userModel.retrieveDetail(req.currentId, req.params.id)){
+    res.statusMessage = 'Bad Request';
+    res.status(400).send();
+  }else {
+      try {
+          const userId = await userModel.update(req.body, req.currentId);
+          res.status(200).send();
+      }catch(err){
+              res.status(500).send();
+      }
+  }
+};
+
+*/
