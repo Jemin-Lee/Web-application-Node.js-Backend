@@ -139,3 +139,22 @@ exports.changeDetails = async function (req, res){
 };
 
 */
+
+
+
+exports.getProfilePhoto = async function (req, res) {
+  try {
+    const photo = await userModel.getProfilePhoto(req.params.id);
+    if (!photo){
+      res.statusMessage = 'Not Foundasdf';
+      res.status(404).send();
+    } else{
+      res.statusMessage = 'OK';
+      res.status(200)
+      .contentType(photo.mimeType)
+      .send(photo.file);
+    }
+  }catch(err){
+    res.status(500).send();
+  }
+};

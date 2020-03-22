@@ -1,6 +1,7 @@
 const db = require('../../config/db');
 const passwords = require('../service/password');
 const randomtoken = require('rand-token');
+var fs = require('mz/fs');
 
 exports.register = async function (user) {
     const query = `INSERT INTO User (name, email, password, city, country) VALUES (?, ?, ?, ?, ?)`;
@@ -121,3 +122,35 @@ exports.update =async function (changes, userId, currentPassword) {
 };
 
 */
+
+
+exports.getProfilePhoto = async function (userId){
+  const query = `select photo_filename from User where user_id = ?`;
+
+  try {
+    const conn = await db.getPool().getConnection();
+    const result = await conn.query(query, userId);
+    const photoName = result[0][0].photo_filename;
+    if (await fs.exists('./storage/photos/'+photoName)){
+      const file = await fs.readFile('./storage/photos/'+photoName);
+
+      let mimeType = "image/?";
+      if (photoName.endsWith('jpg')||photoName.endsWith('jpeg')){
+        mimeType = "image/jpeg";
+      } else if(photoName.endsWith('png')){
+        mimeType = "image/png";
+      } else if (photoName.endsWith('gif')){
+        mimeType = "image/gif";
+      }
+      return {
+        'fileName': file,
+        'mimeType': mimeType
+      };
+    }else{
+      return null;
+    }
+  }catch(err){
+    return null;
+    throw(err);
+  }
+};
