@@ -104,7 +104,7 @@ exports.retrieveDetail = async function (currentId, reqId){
 };
 
 
-/*Update user details
+/* Update user details (come back later)
 
 exports.update =async function (changes, userId, currentPassword) {
   const query = `update User set ? where user_id = ?`;

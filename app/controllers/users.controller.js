@@ -102,7 +102,8 @@ exports.retrieveDetail = async function (req, res) {
   }
 };
 
-/* Change Details
+/* Change Details (Come back later)
+
 
 exports.changeDetails = async function (req, res){
   if ((!('email' in req.body)) || (!checkEmail(req.body.email))){
@@ -138,6 +139,7 @@ exports.changeDetails = async function (req, res){
   }
 };
 
+
 */
 
 
@@ -157,3 +159,8 @@ exports.getProfilePhoto = async function (req, res) {
     res.status(500).send();
   }
 };
+
+/* Put, delete profile photo
+
+
+*/
