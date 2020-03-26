@@ -14,8 +14,8 @@ exports.addPetition = async function (req, res) {
   const categoriesDB = await petitionsModel.categories();
   const categories = categoriesDB[0];
 
-  if (req.body.title.length === 0 || !req.body.title.trim() || !req.body.title){
-    res.statusMessage = "Bad Request";
+  if (req.body.title.length == 0 || !req.body.title.trim() || !req.body.title){
+    res.statusMessage = "Bad Request title";
         res.status(400).send();
   }
 
