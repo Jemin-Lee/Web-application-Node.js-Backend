@@ -13,6 +13,12 @@ exports.viewPetitions = async function (req, res){
 exports.addPetition = async function (req, res) {
   const categoriesDB = await petitionsModel.categories();
   const categories = categoriesDB[0];
+
+  if (req.body.title.length === 0 || !req.body.title.trim() || !req.body.title){
+    res.statusMessage = "Bad Request";
+        res.status(400).send();
+  }
+
   if (!categories.find(element => element.category_id == req.body.categoryId)) {
     res.statusMessage = "Bad Request";
         res.status(400).send();
