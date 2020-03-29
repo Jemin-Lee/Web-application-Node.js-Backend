@@ -43,3 +43,19 @@ exports.addPetition = async function (req, res) {
     res.status(500).send();
   }
 };
+
+
+exports.viewPetition = async function (req, res) {
+  try {
+    const petition = await petitionsModel.viewPetition(req.params.id);
+    if (!petition){
+      res.statusMessage = 'Not Foundasdf';
+      res.status(404).send();
+    } else {
+      res.statusMessage = 'OK';
+      res.status(200).json(petition);
+    }
+  }catch(err){
+    res.status(500).send();
+  }
+}
