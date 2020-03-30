@@ -26,6 +26,11 @@ exports.addPetition = async function (req, res) {
   const categoriesDB = await petitionsModel.categories();
   const categories = categoriesDB[0];
 
+  if (!req.currentId){
+    res.statusMessage = "Unauthorized";
+    res.status(401).send();
+  }
+
   if (((!('title' in req.body)) || (!checkEmpty(req.body.title)))){
     res.statusMessage = "Bad Request title";
     res.status(400).send();
@@ -71,14 +76,14 @@ exports.changePetition = async function (req, res){
     res.statusMessage = "Bad Request";
     res.status(400).send();
   }
+  else if (!(petitionFound.authorId == req.currentId)){
 
-  else if (!req.currentId){
     res.statusMessage = 'Forbidden';
     res.status(403).send();
 
   }
 
-  else if (!(petitionFound.authorId == req.currentId)){
+  else if (!req.currentId){
     res.statusMessage = 'Unauthorized';
     res.status(401).send();
   }

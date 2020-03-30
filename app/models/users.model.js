@@ -89,7 +89,6 @@ exports.retrieveDetail = async function (reqId, currentId){
     const [result] = await conn.query(query, reqId);
     conn.release();
     const userData = result[0];
-    console.log(userData);
     if (!currentId){
       return {
         'name': userData.name,
@@ -103,13 +102,18 @@ exports.retrieveDetail = async function (reqId, currentId){
   }
 };
 
-
+/*
 exports.update =async function (reqBody, userId) {
   const query = `update User set ? where user_id = ?`;
   console.log(snakeCaseKeys(reqBody));
+  console.log(userId);
+  const query2 = `update User set password = ?  where user_id = ?`
   try {
     if (reqBody.password){
-      changes.password = await passwords.hash(changes.password);
+      const hashPass = await passwords.hash(reqBody.password);
+      const conn2 = await db.getPool().getConnection();
+      await conn2.query(query2, [hashPass, userId]);
+
     }
     const conn = await db.getPool().getConnection();
     await conn.query(query, [snakeCaseKeys(reqBody),userId]);
@@ -118,6 +122,19 @@ exports.update =async function (reqBody, userId) {
   }
 };
 
+exports.findPassword = async function (userId){
+    try {
+        const query = `select password from User where user_id = ?`;
+
+        const conn = await db.getPool().getConnection();
+        const [foundDataList] = await conn.query(query, userId);
+        conn.release();
+        return foundDataList[0]
+    }catch(err){
+        return null;
+    }
+};
+*/
 
 exports.getProfilePhoto = async function (userId){
   const query = `select photo_filename from User where user_id = ?`;

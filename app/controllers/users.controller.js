@@ -90,7 +90,6 @@ exports.retrieveDetail = async function (req, res) {
   try{
 
     const userInfo = await userModel.retrieveDetail(req.params.id,req.currentId);
-    console.log(userInfo);
 
     if (!userInfo){
       res.statusMessage = 'Not Found';
@@ -104,9 +103,18 @@ exports.retrieveDetail = async function (req, res) {
   }
 };
 
-
+/*
 exports.changeDetails = async function (req, res){
-  const userInfo = await userModel.retrieveDetail(req.currentId);
+
+  if(!req.currentId){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+  }else {
+    const userInfo = await userModel.retrieveDetail(req.params.id, req.currentId);
+
+    const searchedUser = await userModel.findPassword(req.currentId);
+    const passwordCorrect = await passwords.compare(req.body.currentPassword, searchedUser.password);
+  }
 
   if ((!('email' in req.body)) || (!checkEmail(req.body.email))){
       res.statusMessage = 'Bad Request1';
@@ -120,32 +128,28 @@ exports.changeDetails = async function (req, res){
     res.statusMessage = 'Bad Request3'
     res.status(400).send();
   }
-  console.log(req.currentId);
+
   if (!userInfo){
     res.statusMessage = 'Bad Request4';
     res.status(400).send();
   }
 
-  if (req.body.password !== req.body.currentPassword){
+  if (!passwordCorrect){
     res.statusMessage = 'Unauthorized';
     res.status(401).send();
   }
 
-  if(!req.currentId){
-    res.statusMessage = 'Forbidden';
-    res.status(403).send();
 
-  }
   else {
       try {
-          const userId = await userModel.update(req.body, req.currentId);
-          res.status(200).send();
+        const userId = await userModel.update(req.body, req.currentId);
+        res.status(200).send();
       }catch(err){
               res.status(500).send();
       }
   }
 };
-
+*/
 
 
 exports.getProfilePhoto = async function (req, res) {
