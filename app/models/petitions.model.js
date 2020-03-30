@@ -1,4 +1,5 @@
 const db = require('../../config/db');
+const snakeCaseKeys = require('snakecase-keys')
 
 exports.categories = async function() {
   const query = `select category_id, name from Category`;
@@ -61,6 +62,17 @@ exports.viewPetition = async function(petitionId){
         'closingDate': result[0].closing_date
       };
     }
+  }catch(err){
+    throw err;
+  }
+};
+
+exports.changePetition = async function (reqBody, petitionId){
+  try{
+    const query = `update Petition set ? where petition_id = ?`;
+    console.log(snakeCaseKeys(reqBody));
+    const conn = await db.getPool().getConnection();
+    await conn.query(query, [snakeCaseKeys(reqBody),petitionId]);
   }catch(err){
     throw err;
   }

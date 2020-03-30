@@ -1,4 +1,5 @@
 const petitionsModel = require('../models/petitions.model');
+const passwords = require('../service/password');
 
 function checkEmpty(input){
     if (!input){
@@ -49,7 +50,7 @@ exports.viewPetition = async function (req, res) {
   try {
     const petition = await petitionsModel.viewPetition(req.params.id);
     if (!petition){
-      res.statusMessage = 'Not Foundasdf';
+      res.statusMessage = 'Not Found';
       res.status(404).send();
     } else {
       res.statusMessage = 'OK';
@@ -59,3 +60,41 @@ exports.viewPetition = async function (req, res) {
     res.status(500).send();
   }
 }
+
+
+exports.changePetition = async function (req, res){
+  const petitionFound = await petitionsModel.viewPetition(req.params.id);
+  const categoriesDB = await petitionsModel.categories();
+  const categories = categoriesDB[0];
+
+  if (!categories.find(element => element.category_id == req.body.categoryId)) {
+    res.statusMessage = "Bad Request";
+    res.status(400).send();
+  }
+
+  else if (!req.currentId){
+    res.statusMessage = 'Unauthorized';
+    res.status(401).send();
+  }
+
+  else if (!(petitionFound.authorId == req.currentId)){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+  }
+
+  else if (!petitionFound){
+    res.statusMessage = 'Not Found';
+    res.status(404).send();
+  }
+
+  else{
+    try {
+          await petitionsModel.changePetition(req.body, req.params.id);
+          res.statusMessage = 'OK';
+          res.status(200).send();
+      } catch (err) {
+          res.statusMessage = 'Internal Server Error';
+          res.status(500).send();
+      }
+  }
+};
