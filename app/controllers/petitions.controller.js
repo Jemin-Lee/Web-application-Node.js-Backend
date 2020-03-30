@@ -73,13 +73,14 @@ exports.changePetition = async function (req, res){
   }
 
   else if (!req.currentId){
-    res.statusMessage = 'Unauthorized';
-    res.status(401).send();
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+
   }
 
   else if (!(petitionFound.authorId == req.currentId)){
-    res.statusMessage = 'Forbidden';
-    res.status(403).send();
+    res.statusMessage = 'Unauthorized';
+    res.status(401).send();
   }
 
   else if (!petitionFound){
