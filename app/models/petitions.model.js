@@ -1,5 +1,5 @@
 const db = require('../../config/db');
-const snakeCaseKeys = require('snakecase-keys')
+const snakeCaseKeys = require('snakecase-keys');
 
 exports.categories = async function() {
   const query = `select category_id, name from Category`;

@@ -88,7 +88,9 @@ exports.logout = async function (req, res) {
 
 exports.retrieveDetail = async function (req, res) {
   try{
-    const userInfo = await userModel.retrieveDetail(req.currentId, req.params.id);
+
+    const userInfo = await userModel.retrieveDetail(req.params.id,req.currentId);
+    console.log(userInfo);
 
     if (!userInfo){
       res.statusMessage = 'Not Found';
@@ -102,34 +104,39 @@ exports.retrieveDetail = async function (req, res) {
   }
 };
 
-/* Change Details (Come back later)
-
 
 exports.changeDetails = async function (req, res){
+  const userInfo = await userModel.retrieveDetail(req.currentId);
+
   if ((!('email' in req.body)) || (!checkEmail(req.body.email))){
-      res.statusMessage = 'Bad Request';
+      res.statusMessage = 'Bad Request1';
       res.status(400).send();
   }
   if ((!('name' in req.body)) || (!checkEmpty(req.body.name))) {
-      res.statusMessage = 'Bad Request';
+      res.statusMessage = 'Bad Request2';
       res.status(400).send();
   }
   if (!Number.isInteger(parseInt(req.params.id) || parseInt(req.params.id) < 1)){
-    res.statusMessage = 'Bad Request'
+    res.statusMessage = 'Bad Request3'
     res.status(400).send();
   }
-  if (!checkEmpty(req.body.password) || ){
-      res.statusMessage = 'Forbidden';
-      res.status(403).send();
+  console.log(req.currentId);
+  if (!userInfo){
+    res.statusMessage = 'Bad Request4';
+    res.status(400).send();
   }
-  if(req.currentId !== req.params.id){
+
+  if (req.body.password !== req.body.currentPassword){
+    res.statusMessage = 'Unauthorized';
+    res.status(401).send();
+  }
+
+  if(!req.currentId){
     res.statusMessage = 'Forbidden';
     res.status(403).send();
+
   }
-  if (!await userModel.retrieveDetail(req.currentId, req.params.id)){
-    res.statusMessage = 'Bad Request';
-    res.status(400).send();
-  }else {
+  else {
       try {
           const userId = await userModel.update(req.body, req.currentId);
           res.status(200).send();
@@ -138,9 +145,6 @@ exports.changeDetails = async function (req, res){
       }
   }
 };
-
-
-*/
 
 
 

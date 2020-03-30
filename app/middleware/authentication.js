@@ -6,11 +6,10 @@ exports.setToken = async function (req, res, next) {
     const foundUserList = await userModel.findUserToken(userToken);
     if (foundUserList !== null) {
       req.currentId = foundUserList[0].user_id.toString();
-      next();
     } else{
-      res.statusMessage = 'Unauthorized';
-      res.status(401).send();
+      req.currentId = null;
     }
+    next();
   }catch(err){
       res.status(500).send();
   }

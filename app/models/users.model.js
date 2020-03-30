@@ -1,7 +1,8 @@
 const db = require('../../config/db');
 const passwords = require('../service/password');
 const randomtoken = require('rand-token');
-var fs = require('mz/fs');
+const fs = require('mz/fs');
+const snakeCaseKeys = require('snakecase-keys');
 
 exports.register = async function (user) {
     const query = `INSERT INTO User (name, email, password, city, country) VALUES (?, ?, ?, ?, ?)`;
@@ -80,16 +81,15 @@ exports.findUserToken = async function (userToken){
 /*
 get user information
 */
-exports.retrieveDetail = async function (currentId, reqId){
+exports.retrieveDetail = async function (reqId, currentId){
   const query = `select name, email, city, country from User where user_id = ?`;
 
   try{
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query(query, reqId);
     conn.release();
-
     const userData = result[0];
-
+    console.log(userData);
     if (!currentId){
       return {
         'name': userData.name,
@@ -104,24 +104,19 @@ exports.retrieveDetail = async function (currentId, reqId){
 };
 
 
-/* Update user details (come back later)
-
-exports.update =async function (changes, userId, currentPassword) {
+exports.update =async function (reqBody, userId) {
   const query = `update User set ? where user_id = ?`;
-
+  console.log(snakeCaseKeys(reqBody));
   try {
-    if ('password' in changes &&){
+    if (reqBody.password){
       changes.password = await passwords.hash(changes.password);
     }
-
     const conn = await db.getPool().getConnection();
-    await conn.query(query, changes, userId);
+    await conn.query(query, [snakeCaseKeys(reqBody),userId]);
   }catch(err){
-
+    throw err;
   }
 };
-
-*/
 
 
 exports.getProfilePhoto = async function (userId){
