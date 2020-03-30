@@ -77,3 +77,14 @@ exports.changePetition = async function (reqBody, petitionId){
     throw err;
   }
 };
+
+exports.deletePetition = async function (petitionId){
+  try{
+    const query = `delete from Petition where petition_id = ?`;
+    const conn = await db.getPool().getConnection();
+    await conn.query(query, petitionId);
+    conn.release();
+  }catch(err){
+    throw err;
+  }
+};

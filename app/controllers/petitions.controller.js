@@ -98,3 +98,34 @@ exports.changePetition = async function (req, res){
       }
   }
 };
+
+
+exports.deletePetition = async function (req, res) {
+  const petitionFound = await petitionsModel.viewPetition(req.params.id);
+
+  if (!req.currentId){
+    res.statusMessage = 'Unauthorized';
+    res.status(401).send();
+  }
+
+  else if (!(petitionFound.authorId == req.currentId)){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+  }
+
+  else if (!petitionFound){
+    res.statusMessage = 'Not Found';
+    res.status(404).send();
+  }
+
+  else{
+    try{
+      await petitionsModel.deletePetition(req.params.id);
+      res.statusMessage = 'OK';
+      res.status(200).send();
+    }catch(err){
+      res.statusMessage = 'Internal Server Error';
+      res.status(500).send();
+    }
+  }
+};
