@@ -9,6 +9,7 @@ exports.categories = async function() {
     conn.release();
     return categories;
   } catch(err){
+    errors.logSqlError(err);
     throw err;
   }
 };
@@ -70,7 +71,6 @@ exports.viewPetition = async function(petitionId){
 exports.changePetition = async function (reqBody, petitionId){
   try{
     const query = `update Petition set ? where petition_id = ?`;
-    console.log(snakeCaseKeys(reqBody));
     const conn = await db.getPool().getConnection();
     await conn.query(query, [snakeCaseKeys(reqBody),petitionId]);
   }catch(err){

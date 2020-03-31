@@ -1,5 +1,6 @@
 const petitionsModel = require('../models/petitions.model');
 const passwords = require('../service/password');
+const camelcaseKeys = require('camelcase-keys');
 
 function checkEmpty(input){
     if (!input){
@@ -133,5 +134,21 @@ exports.deletePetition = async function (req, res) {
       res.statusMessage = 'Internal Server Error';
       res.status(500).send();
     }
+  }
+};
+
+
+exports.viewCategories = async function (req, res){
+  try{
+    const categoriesDB = await petitionsModel.categories();
+    const categories = categoriesDB[0].map(category => camelcaseKeys(category));
+    res.statusMessage = 'OK';
+    res.status(200).json(categories);
+
+  }catch(err){
+    if (!err.hasBeenLogged) console.error(err);
+    throw err;
+    res.statusMessage = 'Internal Server Error';
+    res.status(500).send();
   }
 };
