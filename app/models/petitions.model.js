@@ -1,5 +1,6 @@
 const db = require('../../config/db');
 const snakeCaseKeys = require('snakecase-keys');
+const fs = require('mz/fs');
 
 exports.categories = async function() {
   const query = `select category_id, name from Category`;
@@ -86,5 +87,39 @@ exports.deletePetition = async function (petitionId){
     conn.release();
   }catch(err){
     throw err;
+  }
+};
+
+
+exports.getPetitionPhoto = async function (petitionId){
+  const query = `select photo_filename from Petition where petition_id = ?`;
+  try {
+    const conn = await db.getPool().getConnection();
+    const result = await conn.query(query, petitionId);
+    const photoName = result[0][0].photo_filename;
+
+    if (await fs.exists('./storage/photos/'+photoName)){
+      const file = await fs.readFile('./storage/photos/'+photoName);
+
+      let mimeType = "image/?";
+      if (photoName.endsWith('jpg')||photoName.endsWith('jpeg')){
+        mimeType = "image/jpeg";
+      } else if(photoName.endsWith('png')){
+        mimeType = "image/png";
+      } else if (photoName.endsWith('gif')){
+        mimeType = "image/gif";
+      }
+
+      return {
+        'fileName': file,
+        'mimeType': mimeType
+      };
+
+    }else{
+      return null;
+    }
+
+  }catch(err){
+    throw(err);
   }
 };

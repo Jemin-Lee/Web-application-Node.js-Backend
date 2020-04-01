@@ -152,3 +152,19 @@ exports.viewCategories = async function (req, res){
     res.status(500).send();
   }
 };
+
+
+exports.viewPetitionPhoto = async function (req, res){
+  try {
+    const photo = await petitionsModel.getPetitionPhoto(req.params.id);
+    if (!photo){
+      res.statusMessage = 'Not Found';
+      res.status(404).send();
+    } else{
+      res.statusMessage = 'OK';
+      res.status(200).contentType(photo.mimeType).send(photo.fileName);
+    }
+  }catch(err){
+    res.status(500).send();
+  }
+};
