@@ -138,7 +138,6 @@ exports.findPassword = async function (userId){
 
 exports.getProfilePhoto = async function (userId){
   const query = `select photo_filename from User where user_id = ?`;
-
   try {
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, userId);
@@ -163,5 +162,65 @@ exports.getProfilePhoto = async function (userId){
   }catch(err){
     return null;
     throw(err);
+  }
+};
+
+exports.setProfilePhoto = async function (userId, reqBody, fileType){
+  const imageName = randomtoken.generate(16) + fileType;
+  const query = `update User set photo_filename = ? where user_id = ?`;
+  try {
+    await fs.writeFile('./storage/photos/' + imageName, reqBody);
+    const conn = await db.getPool().getConnection()
+    await conn.query(query, [imageName, userId]);
+    conn.release();
+
+  }catch(err){
+    throw err;
+  }
+};
+
+
+exports.findUserId = async function (reqId, currentId){
+  const query = `select name, email, city, country from User where user_id = ?`;
+
+  try{
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query(query, currentId);
+
+    conn.release();
+    const userData = result[0];
+
+    return userData;
+  }catch(err){
+    return null;
+  }
+};
+
+
+exports.deleteProfilePhoto = async function (photo, currentId){
+  try{
+    const query = `update User set photo_filename = null where user_id = ?`;
+    const conn = await db.getPool().getConnection();
+    await conn.query(query, currentId);
+    conn.release();
+    if (await fs.exists('./storage/photos/' + photo)){
+      await fs.unlink('./storage/photos/' + photo);
+    }
+  }catch(err){
+    errors.logSqlError(err);
+    throw err;
+  }
+
+};
+
+exports.getFileName = async function (userId){
+  const query = `select photo_filename from User where user_id = ?`;
+  try {
+    const conn = await db.getPool().getConnection();
+    const result = await conn.query(query, userId);
+    const photoName = result[0][0].photo_filename;
+    return photoName;
+  } catch(err){
+    throw err;
   }
 };

@@ -104,6 +104,7 @@ exports.retrieveDetail = async function (req, res) {
 };
 
 /*
+
 exports.changeDetails = async function (req, res){
 
   if(!req.currentId){
@@ -154,7 +155,6 @@ exports.changeDetails = async function (req, res){
 
 exports.getProfilePhoto = async function (req, res) {
   try {
-    console.log(req.params.id);
     const photo = await userModel.getProfilePhoto(req.params.id);
     if (!photo){
       res.statusMessage = 'Not Found';
@@ -168,7 +168,101 @@ exports.getProfilePhoto = async function (req, res) {
   }
 };
 
-/* Put, delete profile photo
 
 
-*/
+exports.deleteProfilePhoto = async function (req, res){
+  if (!req.currentId){
+    res.statusMessage = 'Unauthorized';
+    res.status(401).send();
+  }
+
+  const userFound = await userModel.findUserId(req.params.id, req.currentId);
+  if (!userFound){
+    res.statusMessage = 'Not Found';
+    res.status(404).send();
+  }
+
+  if (req.params.id !== req.currentId){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+  } else{
+    try{
+      const photo = await userModel.getFileName(req.currentId);
+      if (!photo){
+        res.statusMessage = 'Not Found';
+        res.status(404).send();
+      }else{
+        await userModel.deleteProfilePhoto(photo, req.currentId);
+        res.statusMessage = 'OK';
+        res.status(200).send();
+      }
+
+    }catch(err){
+      if (!err.hasBeenLogged) console.error(err);
+      res.statusMessage = 'Internal Server Error';
+      res.status(500).send();
+    }
+  }
+
+};
+
+
+
+exports.setProfilePhoto = async function (req, res){
+  if (!req.currentId){
+    res.statusMessage = 'Unauthorized';
+    res.status(401).send();
+  }
+
+  if (req.params.id !== req.currentId){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+  }
+
+  const userFound = await userModel.findUserId(req.params.id, req.currentId);
+  if (!userFound){
+    res.statusMessage = 'Not Foundff';
+    res.status(404).send();
+  }
+
+  const imageType = req.header('Content-Type');
+  if (imageType == 'image/jpeg' || imageType == 'image/jpg' || imageType == 'image/png'){
+    try{
+      const photoExist = await userModel.getProfilePhoto(req.currentId);
+
+      let imageExtension = '';
+      switch (imageType) {
+        case 'image/jpeg':
+        imageExtension = '.jpeg';
+        break;
+        case 'image/jpg':
+        imageExtension = '.jpg';
+        break;
+        case 'image/png':
+        imageExtension = '.png';
+        break;
+        default:
+        imageExtension = null;
+        break;
+      }
+
+      if (photoExist) {
+        await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+        res.statusMessage = 'OK';
+        res.status(200).send();
+
+      } else {
+        await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+        res.statusMessage = 'Created';
+        res.status(201).send();
+      }
+
+    }catch(err){
+      res.statusMessage = 'Internal Server Error';
+      res.status(500).send();
+    }
+  }else {
+    res.statusMessage = 'Bad Request';
+    res.status(400).send();
+  }
+};
