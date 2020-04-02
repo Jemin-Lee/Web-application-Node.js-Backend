@@ -161,7 +161,6 @@ exports.getProfilePhoto = async function (req, res) {
       res.status(404).send();
     } else{
       res.statusMessage = 'OK';
-      console.log(photo.mimeType);
       res.status(200).contentType(photo.mimeType).send(photo.fileName);
     }
   }catch(err){
@@ -199,7 +198,6 @@ exports.deleteProfilePhoto = async function (req, res){
       }
 
     }catch(err){
-      if (!err.hasBeenLogged) console.error(err);
       res.statusMessage = 'Internal Server Error';
       res.status(500).send();
     }
@@ -248,11 +246,16 @@ exports.setProfilePhoto = async function (req, res){
       }
 
       if (photoExist) {
+        const photo = await userModel.getFileName(req.currentId);
+        await userModel.deleteProfilePhoto(photo, req.currentId);
         await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+
         res.statusMessage = 'OK';
         res.status(200).send();
 
       } else {
+        const photo = await userModel.getFileName(req.currentId);
+        await userModel.deleteProfilePhoto(photo, req.currentId);
         await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
