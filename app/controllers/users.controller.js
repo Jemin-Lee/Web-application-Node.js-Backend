@@ -161,6 +161,7 @@ exports.getProfilePhoto = async function (req, res) {
       res.status(404).send();
     } else{
       res.statusMessage = 'OK';
+      console.log(photo.mimeType);
       res.status(200).contentType(photo.mimeType).send(photo.fileName);
     }
   }catch(err){
@@ -233,7 +234,7 @@ exports.setProfilePhoto = async function (req, res){
       let imageExtension = '';
       switch (imageType) {
         case 'image/jpeg':
-        imageExtension = '.jpg';
+        imageExtension = '.jpeg';
         break;
         case 'image/gif':
         imageExtension = '.gif';
