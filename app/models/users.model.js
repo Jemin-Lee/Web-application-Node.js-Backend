@@ -164,7 +164,7 @@ exports.getProfilePhoto = async function (userId){
     }
   }catch(err){
 
-    throw(err);
+    throw err;
   }
 };
 
@@ -192,10 +192,15 @@ exports.findUserId = async function (reqId, currentId){
 
     conn.release();
     const userData = result[0];
+    if (!userData){
+      return null;
+    }else{
+      return userData;
+    }
 
-    return userData;
   }catch(err){
     return null;
+    throw err;
   }
 };
 
