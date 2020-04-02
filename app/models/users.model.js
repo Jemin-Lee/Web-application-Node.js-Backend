@@ -147,12 +147,15 @@ exports.getProfilePhoto = async function (userId){
       const file = await fs.readFile('./storage/photos/'+ photoName);
 
       let mimeType = "image/?";
-      if (photoName.endsWith('jpg')||photoName.endsWith('jpeg')){
+      if (photoName.endsWith('jpeg')||photoName.endsWith('jpg')){
         mimeType = "image/jpeg";
+        break;
       } else if(photoName.endsWith('png')){
         mimeType = "image/png";
+        break;
       } else if (photoName.endsWith('gif')){
         mimeType = "image/gif";
+        break;
       }
 
       return {

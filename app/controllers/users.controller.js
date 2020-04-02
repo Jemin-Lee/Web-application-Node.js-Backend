@@ -226,7 +226,7 @@ exports.setProfilePhoto = async function (req, res){
   }
 
   const imageType = req.header('Content-Type');
-  if (imageType == 'image/jpeg' || imageType == 'image/jpg' || imageType == 'image/png'){
+  if (imageType == 'image/jpeg' || imageType == 'image/gif' || imageType == 'image/png'){
     try{
       const photoExist = await userModel.getProfilePhoto(req.currentId);
 
@@ -235,8 +235,8 @@ exports.setProfilePhoto = async function (req, res){
         case 'image/jpeg':
         imageExtension = '.jpg';
         break;
-        case 'image/jpg':
-        imageExtension = '.jpg';
+        case 'image/gif':
+        imageExtension = '.gif';
         break;
         case 'image/png':
         imageExtension = '.png';
