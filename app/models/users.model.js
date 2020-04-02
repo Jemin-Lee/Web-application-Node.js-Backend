@@ -169,15 +169,17 @@ exports.getProfilePhoto = async function (userId){
 };
 
 exports.setProfilePhoto = async function (userId, reqBody, fileType){
-  const imageName = randomtoken.generate(16) + fileType;
+  const imageName = randomtoken.generate(32) + fileType;
   const query = `update User set photo_filename = ? where user_id = ?`;
   try {
     await fs.writeFile('./storage/photos/' + imageName, reqBody);
+
     const conn = await db.getPool().getConnection()
     await conn.query(query, [imageName, userId]);
     conn.release();
 
   }catch(err){
+    fs.unlink('./storage/photos/' + imageName);
     throw err;
   }
 };
