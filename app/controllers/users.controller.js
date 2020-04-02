@@ -233,7 +233,7 @@ exports.setProfilePhoto = async function (req, res){
       let imageExtension = '';
       switch (imageType) {
         case 'image/jpeg':
-        imageExtension = '.jpeg';
+        imageExtension = '.jpg';
         break;
         case 'image/jpg':
         imageExtension = '.jpg';
