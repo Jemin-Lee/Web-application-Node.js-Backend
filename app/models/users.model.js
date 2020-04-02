@@ -149,13 +149,10 @@ exports.getProfilePhoto = async function (userId){
       let mimeType = "image/?";
       if (photoName.endsWith('jpeg')||photoName.endsWith('jpg')){
         mimeType = "image/jpeg";
-        break;
       } else if(photoName.endsWith('png')){
         mimeType = "image/png";
-        break;
       } else if (photoName.endsWith('gif')){
         mimeType = "image/gif";
-        break;
       }
 
       return {
