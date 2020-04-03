@@ -171,12 +171,13 @@ exports.getProfilePhoto = async function (req, res) {
 
 
 exports.deleteProfilePhoto = async function (req, res){
+
   if (!req.currentId){
     res.statusMessage = 'Unauthorized';
     res.status(401).send();
   }
 
-  const userFound = await userModel.findUserId(req.params.id, req.currentId);
+  const userFound = await userModel.findUserId(req.params.id, req.params.id);
   if (!userFound){
     res.statusMessage = 'Not Found';
     res.status(404).send();
