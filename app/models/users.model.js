@@ -143,8 +143,8 @@ exports.getProfilePhoto = async function (userId){
     const result = await conn.query(query, userId);
     const photoName = result[0][0].photo_filename;
 
-    if (await fs.exists('./storage/pictures/'+ photoName)){
-      const file = await fs.readFile('./storage/pictures/'+ photoName);
+    if (await fs.exists('./storage/default/'+ photoName)){
+      const file = await fs.readFile('./storage/default/'+ photoName);
 
       let mimeType = "application/octet-stream";
       if (photoName.endsWith('jpeg')||photoName.endsWith('jpg')){
@@ -173,14 +173,14 @@ exports.setProfilePhoto = async function (userId, reqBody, fileType){
   const imageName = randomtoken.generate(16) + fileType;
   const query = `update User set photo_filename = ? where user_id = ?`;
   try {
-    await fs.writeFile('./storage/pictures/' + imageName, reqBody, {encoding: 'binary'});
+    await fs.writeFile('./storage/default/' + imageName, reqBody, {encoding: 'binary'});
 
     const conn = await db.getPool().getConnection()
     await conn.query(query, [imageName, userId]);
     conn.release();
 
   }catch(err){
-    fs.unlink('./storage/pictures/' + imageName);
+    fs.unlink('./storage/default/' + imageName);
     throw err;
   }
 };
@@ -214,8 +214,8 @@ exports.deleteProfilePhoto = async function (photo, currentId){
     const conn = await db.getPool().getConnection();
     await conn.query(query, currentId);
     conn.release();
-    if (await fs.exists('./storage/pictures/' + photo)){
-      await fs.unlink('./storage/pictures/' + photo);
+    if (await fs.exists('./storage/default/' + photo)){
+      await fs.unlink('./storage/default/' + photo);
     }
   }catch(err){
     errors.logSqlError(err);
