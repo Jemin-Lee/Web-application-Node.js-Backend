@@ -9,7 +9,7 @@ module.exports = function (app) {
     //app.route(app.rootUrl + '/users/:id').patch(authentication.setToken, usersController.changeDetails);
 
     app.route(app.rootUrl + '/users/:id/photo').get(usersController.getProfilePhoto)
-    //.delete(authentication.setToken, usersController.deleteProfilePhoto)
+    .delete(authentication.setToken, usersController.deleteProfilePhoto)
     .put(authentication.setToken, usersController.setProfilePhoto);
 
 
