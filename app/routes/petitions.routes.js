@@ -6,9 +6,9 @@ module.exports = function (app) {
 
   app.route(app.rootUrl + '/petitions/categories').get(petitionsController.viewCategories);
 
-  app.route(app.rootUrl + '/petitions/:id').get(petitionsController.viewPetition)
-  .patch(authentication.setToken, petitionsController.changePetition);
-  //.delete(authentication.setToken, petitionsController.deletePetition);
+  app.route(app.rootUrl + '/petitions/:id').get(petitionsController.viewPetition);
+  app.route(app.rootUrl + '/petitions/:id').patch(authentication.setToken, petitionsController.changePetition);
+  app.route(app.rootUrl + '/petitions/:id').delete(authentication.setToken, petitionsController.deletePetition);
 
   app.route(app.rootUrl + '/petitions/:id/photo').get(petitionsController.viewPetitionPhoto);
 };

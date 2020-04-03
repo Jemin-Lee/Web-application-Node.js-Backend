@@ -8,9 +8,9 @@ module.exports = function (app) {
     app.route(app.rootUrl + '/users/:id').get(authentication.setToken, usersController.retrieveDetail);
     //app.route(app.rootUrl + '/users/:id').patch(authentication.setToken, usersController.changeDetails);
 
-    app.route(app.rootUrl + '/users/:id/photo').get(usersController.getProfilePhoto)
-    //.delete(authentication.setToken, usersController.deleteProfilePhoto)
-    .put(authentication.setToken, usersController.setProfilePhoto);
+    app.route(app.rootUrl + '/users/:id/photo').get(usersController.getProfilePhoto);
+    //app.route(app.rootUrl + '/users/:id/photo').delete(authentication.setToken, usersController.deleteProfilePhoto);
+    app.route(app.rootUrl + '/users/:id/photo').put(authentication.setToken, usersController.setProfilePhoto);
 
 
 };
