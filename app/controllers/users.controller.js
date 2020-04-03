@@ -176,19 +176,19 @@ exports.deleteProfilePhoto = async function (req, res){
       res.statusMessage = 'Unauthorized wrong token';
       res.status(401).send();
     }else{
+      const userFound = await userModel.findUserId(req.params.id, req.currentId);
+      const photo = await userModel.getFileName(req.currentId);
       if (req.params.id !== req.currentId){
         res.statusMessage = 'Forbidden';
         res.status(403).send();
       }
 
-      const userFound = await userModel.findUserId(req.params.id, req.currentId);
-      if (!userFound){
+      else if (!userFound){
         res.statusMessage = 'Unauthorized';
         res.status(401).send();
       }
 
-      const photo = await userModel.getFileName(req.currentId);
-      if (!photo){
+      else if (!photo){
         res.statusMessage = 'Not Found';
         res.status(404).send();
       }else{
