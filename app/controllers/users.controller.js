@@ -173,7 +173,7 @@ exports.getProfilePhoto = async function (req, res) {
 exports.deleteProfilePhoto = async function (req, res){
   try{
     if (!req.currentId){
-      res.statusMessage = 'Unauthorized';
+      res.statusMessage = 'Unauthorized wrong token';
       res.status(401).send();
     }else{
       if (req.params.id !== req.currentId){
