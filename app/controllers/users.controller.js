@@ -176,7 +176,6 @@ exports.deleteProfilePhoto = async function (req, res){
       res.statusMessage = 'Unauthorized';
       res.status(401).send();
     }else{
-
       if (req.params.id !== req.currentId){
         res.statusMessage = 'Forbidden';
         res.status(403).send();
@@ -184,8 +183,8 @@ exports.deleteProfilePhoto = async function (req, res){
 
       const userFound = await userModel.findUserId(req.params.id, req.currentId);
       if (!userFound){
-        res.statusMessage = 'Not Found';
-        res.status(404).send();
+        res.statusMessage = 'Unauthorized';
+        res.status(401).send();
       }
 
       const photo = await userModel.getFileName(req.currentId);
@@ -201,7 +200,6 @@ exports.deleteProfilePhoto = async function (req, res){
     }
 
   }catch(err){
-
     res.statusMessage = 'Internal Server Error';
     res.status(500).send();
   }
