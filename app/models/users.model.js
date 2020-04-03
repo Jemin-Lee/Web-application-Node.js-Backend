@@ -210,13 +210,10 @@ exports.findUserId = async function (reqId, currentId){
 
 exports.deleteProfilePhoto = async function (photo, currentId){
   try{
-    const query = `update User set photo_filename = null where user_id = ?`;
+    const query = `update User set photo_filename = NULL where user_id = ?`;
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, currentId);
     conn.release();
-    if (result.changedRows !== 1) {
-            throw Error('Should be exactly one user whose profile photo was modified.');
-        }
     if (await fs.exists('./storage/default/' + photo)){
       await fs.unlink('./storage/default/' + photo);
     }
