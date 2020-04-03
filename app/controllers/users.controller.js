@@ -172,40 +172,37 @@ exports.getProfilePhoto = async function (req, res) {
 
 exports.deleteProfilePhoto = async function (req, res){
   console.log(req.currentId);
-  if (!req.currentId){
-    res.statusMessage = 'Unauthorized';
-    res.status(401).send();
-  }else{
-    // const userFound = await userModel.findUserId(req.params.id, req.currentId);
-    // if (!userFound){
-    //   res.statusMessage = 'Not Found';
-    //   res.status(404).send();
-    // }
+  try{
+    if (!req.currentId){
+      res.statusMessage = 'Unauthorized';
+      res.status(401).send();
+    }
 
     if (req.params.id !== req.currentId){
       res.statusMessage = 'Forbidden';
       res.status(403).send();
-    } else{
-      try{
-        const photo = await userModel.getFileName(req.currentId);
-        if (!photo){
-          res.statusMessage = 'Not Found';
-          res.status(404).send();
-        }else{
-          await userModel.deleteProfilePhoto(photo, req.currentId);
-          res.statusMessage = 'OK';
-          res.status(200).send();
-        }
-
-      }catch(err){
-        res.statusMessage = 'Internal Server Error';
-        res.status(500).send();
-      }
     }
+
+    const userFound = await userModel.findUserId(req.params.id, req.currentId);
+    if (!userFound){
+      res.statusMessage = 'Not Found';
+      res.status(404).send();
+    }
+
+    const photo = await userModel.getFileName(req.currentId);
+    if (!photo){
+      res.statusMessage = 'Not Found';
+      res.status(404).send();
+    }else{
+      await userModel.deleteProfilePhoto(photo, req.currentId);
+      res.statusMessage = 'OK';
+      res.status(200).send();
+    }
+
+  }catch(err){
+    res.statusMessage = 'Internal Server Error';
+    res.status(500).send();
   }
-
-
-
 };
 
 
