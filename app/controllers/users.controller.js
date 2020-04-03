@@ -177,7 +177,7 @@ exports.deleteProfilePhoto = async function (req, res){
     res.status(401).send();
   }
 
-  const userFound = await userModel.findUserId(req.params.id, req.params.id);
+  const userFound = await userModel.findUserId(req.params.id, req.currentId);
   if (!userFound){
     res.statusMessage = 'Not Found';
     res.status(404).send();
