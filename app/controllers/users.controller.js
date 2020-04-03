@@ -247,11 +247,8 @@ exports.setProfilePhoto = async function (req, res){
 
       if (photoExist) {
         const photo = await userModel.getFileName(req.currentId);
-
-        await Promise.all([
-          await userModel.deleteProfilePhoto(photo, req.currentId),
-          await userModel.setProfilePhoto(req.currentId, req.body, imageExtension)
-        ]);
+        await userModel.deleteProfilePhoto(photo, req.currentId);
+        await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
         res.statusMessage = 'OK';
         res.status(200).send();
 
