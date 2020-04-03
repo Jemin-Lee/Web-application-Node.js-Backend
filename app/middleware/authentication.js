@@ -8,8 +8,6 @@ exports.setToken = async function (req, res, next) {
       req.currentId = foundUserList[0].user_id.toString();
     } else{
       req.currentId = null;
-      res.statusMessage = 'Unauthorized';
-      res.status(401).send();
     }
     next();
   }catch(err){
