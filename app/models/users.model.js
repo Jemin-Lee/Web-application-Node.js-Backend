@@ -66,7 +66,6 @@ exports.findUserToken = async function (userToken){
         const conn = await db.getPool().getConnection();
         const foundUserList = await conn.query(query, userToken);
         conn.release();
-        console.log(foundUserList);
         return foundUserList[0];
     }catch(err){
         throw err;
