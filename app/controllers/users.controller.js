@@ -231,17 +231,19 @@ exports.deleteProfilePhoto = async function (req, res){
 
 
 exports.setProfilePhoto = async function (req, res){
-  if (req.params.id !== req.currentId){
-    res.statusMessage = 'Forbidden';
-    res.status(403).send();
-    return;
-  }
-  const userFound = await userModel.findUserId(req.currentId);
+  userId = req.params.id;
+  const userFound = await userModel.findUserId(userId);
   if (!userFound){
     res.statusMessage = 'Not Found';
     res.status(404).send();
     return;
   }
+  if (req.currentId !== userId){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+    return;
+  }
+
   const imageType = req.header('Content-Type');
   let imageExtension = '';
   switch (imageType) {
@@ -255,22 +257,22 @@ exports.setProfilePhoto = async function (req, res){
     imageExtension = null;
     break;
   }
-  if (!imageExtension){
+  if (imageExtension === null){
     res.statusMessage = 'Bad Request';
     res.status(400).send();
     return;
   }else {
     try{
-      const photoExist = await userModel.getProfilePhoto(req.currentId);
+      const photoExist = await userModel.getProfilePhoto(userId);
       if (photoExist) {
-        const photo = await userModel.getFileName(req.currentId);
-        await userModel.deleteProfilePhoto(photo, req.currentId);
-        await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+        const photo = await userModel.getFileName(userId);
+        await userModel.deleteProfilePhoto(photo, userId);
+        await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'OK';
         res.status(200).send();
         return;
       } else {
-        await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+        await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
         return;
