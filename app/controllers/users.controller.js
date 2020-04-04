@@ -181,8 +181,8 @@ exports.getProfilePhoto = async function (req, res) {
 
 exports.deleteProfilePhoto = async function (req, res){
   try{
-    const userFound = await userModel.findUserId(req.params.id);
-    const photo = await userModel.getFileName(req.params.id);
+    const userFound = await userModel.findUserId(req.currentId);
+    const photo = await userModel.getFileName(req.currentId);
     if (!userFound){
       res.statusMessage = 'Not Found';
       res.status(404).send();
@@ -199,7 +199,7 @@ exports.deleteProfilePhoto = async function (req, res){
         res.status(404).send();
         return;
       }else{
-        await userModel.deleteProfilePhoto(photo, req.params.id);
+        await userModel.deleteProfilePhoto(photo, req.currentId);
         res.statusMessage = 'OK';
         res.status(200).send();
       }
