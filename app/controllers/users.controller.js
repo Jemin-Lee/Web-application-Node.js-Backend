@@ -35,6 +35,7 @@ exports.register = async function (req, res) {
         try {
             const userId = await userModel.register(req.body);
             res.status(201).json({userId});
+            return;
         }catch(err){
             if (err.sqlMessage && err.sqlMessage.includes('Duplicate entry')){
                 res.statusMessage = 'Username or Email already exists';
@@ -42,6 +43,7 @@ exports.register = async function (req, res) {
                 return;
             }else{
                 res.status(500).send();
+                return;
             }
         }
     }
@@ -51,7 +53,6 @@ exports.login = async function (req, res) {
     //search for user with an unique email
     const searchedUser = await userModel.findUser(req.body.email);
     if (searchedUser){
-        //compare password
         const passwordCorrect = await passwords.compare(req.body.password, searchedUser.password);
         if (passwordCorrect){
             try{
@@ -84,6 +85,7 @@ exports.logout = async function (req, res) {
     if (!userId){
       res.statusMessage = 'Unauthorized wrong token';
       res.status(401).send();
+      return;
     }
     await userModel.logout(req.currentId);
     res.statusMessage = 'OK';
@@ -179,6 +181,7 @@ exports.getProfilePhoto = async function (req, res) {
     }
   }catch(err){
     res.status(500).send();
+    return;
   }
 };
 
@@ -213,6 +216,7 @@ exports.deleteProfilePhoto = async function (req, res){
         await userModel.deleteProfilePhoto(photo, req.currentId);
         res.statusMessage = 'OK';
         res.status(200).send();
+        return;
       }
 
     }
@@ -220,6 +224,7 @@ exports.deleteProfilePhoto = async function (req, res){
   }catch(err){
     res.statusMessage = 'Internal Server Error';
     res.status(500).send();
+    return;
   }
 };
 
@@ -279,6 +284,7 @@ exports.setProfilePhoto = async function (req, res){
     }catch(err){
       res.statusMessage = 'Internal Server Error';
       res.status(500).send();
+      return;
     }
   }
 };
