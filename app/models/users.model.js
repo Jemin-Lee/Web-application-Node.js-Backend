@@ -33,7 +33,6 @@ exports.login = async function (userId){
 exports.findUser = async function (email){
     try {
         const query = `select user_id, password from User where email = ?`;
-
         const conn = await db.getPool().getConnection();
         const [foundDataList] = await conn.query(query, email);
         conn.release();
