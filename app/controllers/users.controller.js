@@ -167,9 +167,11 @@ exports.getProfilePhoto = async function (req, res) {
     if (!photo){
       res.statusMessage = 'Not Found';
       res.status(404).send();
+      return;
     } else{
       res.statusMessage = 'OK';
       res.status(200).contentType(photo.mimeType).send(photo.fileName);
+      return;
     }
   }catch(err){
     res.status(500).send();
@@ -265,11 +267,13 @@ exports.setProfilePhoto = async function (req, res){
         await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
         res.statusMessage = 'OK';
         res.status(200).send();
+        return;
       } else {
 
         await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
+        return;
       }
 
     }catch(err){
