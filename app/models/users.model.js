@@ -189,7 +189,7 @@ exports.findUserId = async function (reqId){
     conn.release();
 
     const userData = result[0];
-    if (!userData){
+    if (userData.length < 1){
       return null;
     }else{
       return userData;
