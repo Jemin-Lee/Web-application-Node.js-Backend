@@ -24,7 +24,6 @@ exports.userLoginCheck = async function (req, res, next) {
         if (!foundUser) {
             res.statusMessage = 'Unauthorized';
             res.status(401).send();
-            return;
         } else {
             req.currentId = foundUser[0].user_id.toString();
             next();

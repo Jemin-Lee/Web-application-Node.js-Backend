@@ -66,11 +66,8 @@ exports.findUserToken = async function (userToken){
         const conn = await db.getPool().getConnection();
         const foundUserList = await conn.query(query, userToken);
         conn.release();
-        if (!foundUserList[0].length) {
-          return null;
-        }else{
-          return foundUserList[0];
-        }
+        console.log(foundUserList);
+        return foundUserList[0];
     }catch(err){
         throw err;
     }
@@ -211,7 +208,6 @@ exports.deleteProfilePhoto = async function (photo, currentId){
     if (await fs.exists('./storage/photos/' + photo)){
       await fs.unlink('./storage/photos/' + photo);
     }
-    console.log('adf');
     const query = `update User set photo_filename = NULL where user_id = ?`;
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, currentId);

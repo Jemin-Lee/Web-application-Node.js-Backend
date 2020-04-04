@@ -191,7 +191,7 @@ exports.deleteProfilePhoto = async function (req, res){
   try{
     const userFound = await userModel.findUserId(req.params.id);
     const photo = await userModel.getFileName(req.params.id);
-    if (!photo || !userFound){
+    if (!userFound){
       res.statusMessage = 'Not Found';
       res.status(404).send();
       return;
@@ -202,9 +202,15 @@ exports.deleteProfilePhoto = async function (req, res){
       res.status(403).send();
       return;
     }else{
-      await userModel.deleteProfilePhoto(photo, req.params.id);
-      res.statusMessage = 'OK';
-      res.status(200).send();
+      if(!photo){
+        res.statusMessage = 'Not Found';
+        res.status(404).send();
+        return;
+      }else{
+        await userModel.deleteProfilePhoto(photo, req.params.id);
+        res.statusMessage = 'OK';
+        res.status(200).send();
+      }
     }
   }catch(err){
     res.statusMessage = 'Internal Server Error';
@@ -260,7 +266,7 @@ exports.setProfilePhoto = async function (req, res){
         await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
-        
+
       }
     }catch(err){
       res.statusMessage = 'Internal Server Error';
