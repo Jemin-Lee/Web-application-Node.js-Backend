@@ -226,7 +226,7 @@ exports.setProfilePhoto = async function (req, res){
   }
 
   const imageType = req.header('Content-Type');
-  let imageExtension = '';
+  let imageExtension = null;
   switch (imageType) {
     case 'image/jpeg':
     imageExtension = '.jpg';
@@ -234,11 +234,8 @@ exports.setProfilePhoto = async function (req, res){
     case 'image/png':
     imageExtension = '.png';
     break;
-    default:
-    imageExtension = null;
-    break;
   }
-  if (imageExtension === null){
+  if (!imageExtension){
     res.statusMessage = 'Bad Request';
     res.status(400).send();
     return;
