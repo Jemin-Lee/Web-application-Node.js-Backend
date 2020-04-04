@@ -159,6 +159,7 @@ exports.getProfilePhoto = async function (userId){
       return null;
     }
   }catch(err){
+    return null;
     throw err;
   }
 };
@@ -207,10 +208,12 @@ exports.deleteProfilePhoto = async function (photo, currentId){
     if (await fs.exists('./storage/photos/' + photo)){
       await fs.unlink('./storage/photos/' + photo);
     }
+    console.log('r')
     const query = `update User set photo_filename = NULL where user_id = ?`;
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, currentId);
     conn.release();
+    console.log('e')
   }catch(err){
     throw err;
   }

@@ -165,15 +165,13 @@ exports.getProfilePhoto = async function (req, res) {
     if (!photo){
       res.statusMessage = 'Not Found';
       res.status(404).send();
-      return;
     } else{
       res.statusMessage = 'OK';
       res.status(200).contentType(photo.mimeType).send(photo.fileName);
-      return;
     }
   }catch(err){
+    res.statusMessage = 'Internal Server Error';
     res.status(500).send();
-    return;
   }
 };
 
@@ -182,7 +180,9 @@ exports.getProfilePhoto = async function (req, res) {
 exports.deleteProfilePhoto = async function (req, res){
   try{
     const userFound = await userModel.findUserId(req.currentId);
+    console.log('1');
     const photo = await userModel.getFileName(req.currentId);
+    console.log('2');
     if (!userFound){
       res.statusMessage = 'Not Found';
       res.status(404).send();
@@ -242,26 +242,26 @@ exports.setProfilePhoto = async function (req, res){
     res.statusMessage = 'Bad Request';
     res.status(400).send();
     return;
-  }else {
-    try{
-      const photoExist = await userModel.getProfilePhoto(userId);
-      if (photoExist) {
-        const photo = await userModel.getFileName(userId);
-        await userModel.deleteProfilePhoto(photo, userId);
-        await userModel.setProfilePhoto(userId, req.body, imageExtension);
-        res.statusMessage = 'OK';
-        res.status(200).send();
-
-      }else {
-        const photo = await userModel.getFileName(userId);
-        await userModel.setProfilePhoto(userId, req.body, imageExtension);
-        res.statusMessage = 'Created';
-        res.status(201).send();
-
-      }
-    }catch(err){
-      res.statusMessage = 'Internal Server Error';
-      res.status(500).send();
-    }
   }
+  try{
+    const photoExist = await userModel.getProfilePhoto(req.currentId);
+    if (photoExist) {
+      const photo = await userModel.getFileName(req.currentId);
+      await userModel.deleteProfilePhoto(photo, req.currentId);
+      await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+      res.statusMessage = 'OK';
+      res.status(200).send();
+
+    }else {
+      const photo = await userModel.getFileName(req.currentId);
+      await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+      res.statusMessage = 'Created';
+      res.status(201).send();
+
+    }
+  }catch(err){
+    res.statusMessage = 'Internal Server Error';
+    res.status(500).send();
+  }
+
 };
