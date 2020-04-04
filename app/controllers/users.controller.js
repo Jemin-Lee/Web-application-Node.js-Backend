@@ -243,28 +243,26 @@ exports.setProfilePhoto = async function (req, res){
     res.status(404).send();
     return;
   }
-
   const imageType = req.header('Content-Type');
-  if (imageType == 'image/jpeg'|| imageType == 'image/png'){
+  let imageExtension = '';
+  switch (imageType) {
+    case 'image/jpeg':
+    imageExtension = '.jpg';
+    break;
+    case 'image/png':
+    imageExtension = '.png';
+    break;
+    default:
+    imageExtension = null;
+    break;
+  }
+  if (!imageExtension){
+    res.statusMessage = 'Bad Request';
+    res.status(400).send();
+    return;
+  }else {
     try{
       const photoExist = await userModel.getProfilePhoto(req.currentId);
-
-      let imageExtension = '';
-      switch (imageType) {
-        case 'image/jpeg':
-        imageExtension = '.jpg';
-        break;
-        // case 'image/gif':
-        // imageExtension = '.gif';
-        // break;
-        case 'image/png':
-        imageExtension = '.png';
-        break;
-        default:
-        imageExtension = null;
-        break;
-      }
-
       if (photoExist) {
         const photo = await userModel.getFileName(req.currentId);
         await userModel.deleteProfilePhoto(photo, req.currentId);
@@ -273,20 +271,14 @@ exports.setProfilePhoto = async function (req, res){
         res.status(200).send();
         return;
       } else {
-
         await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
         return;
       }
-
     }catch(err){
       res.statusMessage = 'Internal Server Error';
       res.status(500).send();
     }
-  }else {
-    res.statusMessage = 'Bad Request';
-    res.status(400).send();
-    return;
   }
 };
