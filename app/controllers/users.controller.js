@@ -190,7 +190,7 @@ exports.getProfilePhoto = async function (req, res) {
 exports.deleteProfilePhoto = async function (req, res){
   try{
     const userFound = await userModel.findUserId(req.params.id);
-    const photo = await userModel.getFileName(req.currentId);
+    const photo = await userModel.getFileName(req.params.id);
     if (!photo || !userFound){
       res.statusMessage = 'Not Found';
       res.status(404).send();
@@ -202,7 +202,7 @@ exports.deleteProfilePhoto = async function (req, res){
       res.status(403).send();
       return;
     }else{
-      await userModel.deleteProfilePhoto(photo, req.currentId);
+      await userModel.deleteProfilePhoto(photo, req.params.id);
       res.statusMessage = 'OK';
       res.status(200).send();
     }
@@ -248,20 +248,19 @@ exports.setProfilePhoto = async function (req, res){
   }else {
     try{
       const photoExist = await userModel.getProfilePhoto(userId);
+      const photo = await userModel.getFileName(userId);
+
       if (photoExist) {
         await userModel.deleteProfilePhoto(photo, userId);
-      }
-
-      const photo = await userModel.getFileName(userId);
-      await userModel.setProfilePhoto(userId, req.body, imageExtension);
-      if (photoExist) {
-
+        await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'OK';
         res.status(200).send();
+
       }else {
         await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
+        
       }
     }catch(err){
       res.statusMessage = 'Internal Server Error';

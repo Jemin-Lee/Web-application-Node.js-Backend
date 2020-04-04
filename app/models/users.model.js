@@ -163,7 +163,6 @@ exports.getProfilePhoto = async function (userId){
       return null;
     }
   }catch(err){
-
     throw err;
   }
 };
@@ -180,7 +179,6 @@ exports.setProfilePhoto = async function (userId, reqBody, fileType){
     conn.release();
 
   }catch(err){
-    fs.unlink('./storage/photos/' + imageName);
     throw err;
   }
 };
@@ -210,17 +208,17 @@ exports.findUserId = async function (reqId){
 
 exports.deleteProfilePhoto = async function (photo, currentId){
   try{
+    if (await fs.exists('./storage/photos/' + photo)){
+      await fs.unlink('./storage/photos/' + photo);
+    }
+    console.log('adf');
     const query = `update User set photo_filename = NULL where user_id = ?`;
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, currentId);
     conn.release();
-    if (await fs.exists('./storage/photos/' + photo)){
-      await fs.unlink('./storage/photos/' + photo);
-    }
   }catch(err){
     throw err;
   }
-
 };
 
 exports.getFileName = async function (userId){
