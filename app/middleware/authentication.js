@@ -21,10 +21,14 @@ exports.userLoginCheck = async function (req, res, next) {
     const userToken = req.header('X-Authorization');
     try {
         const foundUser = await userModel.findUserToken(userToken);
-        if (!foundUser || !foundUser.length) {
-            res.statusMessage = 'Unauthorized';
-            res.status(401).send();
-        } else {
+        if (!foundUser) {
+          res.statusMessage = 'Unauthorized';
+          res.status(401).send();
+        }
+        if (!foundUser.length){
+          res.statusMessage = 'Unauthorized';
+          res.status(401).send();
+        }else {
             req.currentId = foundUser[0].user_id.toString();
             next();
         }
