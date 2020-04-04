@@ -5,7 +5,7 @@ exports.setToken = async function (req, res, next) {
   try {
       const foundUser = await userModel.findUserToken(userToken);
       if (foundUser === null) {
-        res.status(401).send();
+        req.currentId = null;
       } else{
         req.currentId = foundUser[0].user_id.toString();
       }
