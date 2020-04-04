@@ -189,42 +189,26 @@ exports.getProfilePhoto = async function (req, res) {
 
 exports.deleteProfilePhoto = async function (req, res){
   try{
-    if (!req.currentId){
-      res.statusMessage = 'Unauthorized wrong token';
-      res.status(401).send();
+    const userFound = await userModel.findUserId(req.params.id);
+    const photo = await userModel.getFileName(req.currentId);
+    if (!photo || !userFound){
+      res.statusMessage = 'Not Found';
+      res.status(404).send();
       return;
-    }else{
-      const userFound = await userModel.findUserId(req.params.id, req.currentId);
-      const photo = await userModel.getFileName(req.currentId);
-      if (req.params.id !== req.currentId){
-        res.statusMessage = 'Forbidden';
-        res.status(403).send();
-        return;
-      }
-
-      else if (!userFound){
-        res.statusMessage = 'Unauthorized';
-        res.status(401).send();
-        return;
-      }
-
-      else if (!photo){
-        res.statusMessage = 'Not Found';
-        res.status(404).send();
-        return;
-      }else{
-        await userModel.deleteProfilePhoto(photo, req.currentId);
-        res.statusMessage = 'OK';
-        res.status(200).send();
-        return;
-      }
-
     }
 
+    if (req.params.id !== req.currentId){
+      res.statusMessage = 'Forbidden';
+      res.status(403).send();
+      return;
+    }else{
+      await userModel.deleteProfilePhoto(photo, req.currentId);
+      res.statusMessage = 'OK';
+      res.status(200).send();
+    }
   }catch(err){
     res.statusMessage = 'Internal Server Error';
     res.status(500).send();
-    return;
   }
 };
 
@@ -267,24 +251,21 @@ exports.setProfilePhoto = async function (req, res){
       if (photoExist) {
         await userModel.deleteProfilePhoto(photo, userId);
       }
-      
+
       const photo = await userModel.getFileName(userId);
       await userModel.setProfilePhoto(userId, req.body, imageExtension);
       if (photoExist) {
 
         res.statusMessage = 'OK';
         res.status(200).send();
-        return;
       }else {
         await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
-        return;
       }
     }catch(err){
       res.statusMessage = 'Internal Server Error';
       res.status(500).send();
-      return;
     }
   }
 };
