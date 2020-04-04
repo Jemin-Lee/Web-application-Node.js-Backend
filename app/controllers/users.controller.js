@@ -265,13 +265,17 @@ exports.setProfilePhoto = async function (req, res){
     try{
       const photoExist = await userModel.getProfilePhoto(userId);
       if (photoExist) {
-        const photo = await userModel.getFileName(userId);
         await userModel.deleteProfilePhoto(photo, userId);
-        await userModel.setProfilePhoto(userId, req.body, imageExtension);
+      }
+      
+      const photo = await userModel.getFileName(userId);
+      await userModel.setProfilePhoto(userId, req.body, imageExtension);
+      if (photoExist) {
+
         res.statusMessage = 'OK';
         res.status(200).send();
         return;
-      } else {
+      }else {
         await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
