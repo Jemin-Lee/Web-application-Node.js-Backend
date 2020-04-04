@@ -15,3 +15,25 @@ exports.setToken = async function (req, res, next) {
     res.status(500).send();
   }
 };
+
+
+exports.loginRequired = async function (req, res, next) {
+    const token = req.header('X-Authorization');
+
+    try {
+        const result = await findUserIdByToken(token);
+        if (result === null) {
+            res.statusMessage = 'Unauthorized';
+            res.status(401)
+                .send();
+        } else {
+            req.authenticatedUserId = result.user_id.toString();
+            next();
+        }
+    } catch (err) {
+        if (!err.hasBeenLogged) console.error(err);
+        res.statusMessage = 'Internal Server Error';
+        res.status(500)
+            .send();
+    }
+};
