@@ -213,14 +213,13 @@ exports.deleteProfilePhoto = async function (req, res){
 
 
 exports.setProfilePhoto = async function (req, res){
-  userId = req.params.id;
-  const userFound = await userModel.findUserId(userId);
+  const userFound = await userModel.findUserId(req.currentId);
   if (!userFound){
     res.statusMessage = 'Not Found';
     res.status(404).send();
     return;
   }
-  if (req.currentId !== userId){
+  if (req.params.id !== req.currentId){
     res.statusMessage = 'Forbidden';
     res.status(403).send();
     return;
@@ -246,9 +245,8 @@ exports.setProfilePhoto = async function (req, res){
   }else {
     try{
       const photoExist = await userModel.getProfilePhoto(userId);
-      const photo = await userModel.getFileName(userId);
-
       if (photoExist) {
+        const photo = await userModel.getFileName(userId);
         await userModel.deleteProfilePhoto(photo, userId);
         await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'OK';
