@@ -167,15 +167,12 @@ exports.getProfilePhoto = async function (req, res) {
     if (!photo){
       res.statusMessage = 'Not Found';
       res.status(404).send();
-      return;
     } else{
       res.statusMessage = 'OK';
       res.status(200).contentType(photo.mimeType).send(photo.fileName);
-      return;
     }
   }catch(err){
     res.status(500).send();
-    return;
   }
 };
 

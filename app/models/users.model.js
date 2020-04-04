@@ -143,6 +143,7 @@ exports.getProfilePhoto = async function (userId){
     const result = await conn.query(query, userId);
     const photoName = result[0][0].photo_filename;
 
+
     if (await fs.exists('./storage/photos/'+ photoName)){
       const file = await fs.readFile('./storage/photos/'+ photoName);
 
@@ -226,10 +227,12 @@ exports.deleteProfilePhoto = async function (photo, currentId){
 
 exports.getFileName = async function (userId){
   const query = `select photo_filename from User where user_id = ?`;
+
   try {
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, userId);
     const photoName = result[0][0].photo_filename;
+
     return photoName;
   } catch(err){
     throw err;
