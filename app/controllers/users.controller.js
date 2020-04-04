@@ -253,6 +253,7 @@ exports.setProfilePhoto = async function (req, res){
         res.status(200).send();
 
       }else {
+        const photo = await userModel.getFileName(userId);
         await userModel.setProfilePhoto(userId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
