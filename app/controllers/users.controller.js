@@ -220,12 +220,12 @@ exports.setProfilePhoto = async function (req, res){
 
   const userFound = await userModel.findUserId(req.params.id, req.currentId);
   if (!userFound){
-    res.statusMessage = 'Not Foundff';
+    res.statusMessage = 'Not Found';
     res.status(404).send();
   }
 
   const imageType = req.header('Content-Type');
-  if (imageType == 'image/jpeg' || imageType == 'image/gif' || imageType == 'image/png'){
+  if (imageType == 'image/jpeg'|| imageType == 'image/png'){
     try{
       const photoExist = await userModel.getProfilePhoto(req.currentId);
 
@@ -234,9 +234,9 @@ exports.setProfilePhoto = async function (req, res){
         case 'image/jpeg':
         imageExtension = '.jpg';
         break;
-        case 'image/gif':
-        imageExtension = '.gif';
-        break;
+        // case 'image/gif':
+        // imageExtension = '.gif';
+        // break;
         case 'image/png':
         imageExtension = '.png';
         break;
