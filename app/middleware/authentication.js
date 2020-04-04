@@ -4,7 +4,7 @@ exports.setToken = async function (req, res, next) {
   const userToken = req.header('X-Authorization');
   try {
       const foundUser = await userModel.findUserToken(userToken);
-      if (!foundUser.length) {
+      if (!foundUser || !foundUser.length) {
         req.currentId = null;
       } else{
         req.currentId = foundUser[0].user_id.toString();
