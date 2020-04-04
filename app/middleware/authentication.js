@@ -21,7 +21,7 @@ exports.userLoginCheck = async function (req, res, next) {
     const userToken = req.header('X-Authorization');
     try {
         const foundUser = await userModel.findUserToken(userToken);
-        if (!foundUser) {
+        if (foundUser === null) {
           res.statusMessage = 'Unauthorized';
           res.status(401).send();
         }
