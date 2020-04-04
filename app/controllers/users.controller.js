@@ -231,7 +231,6 @@ exports.setProfilePhoto = async function (req, res){
     res.status(403).send();
     return;
   }
-  console.log('asdf');
   const userFound = await userModel.findUserId(req.params.id, req.currentId);
   if (!userFound){
     res.statusMessage = 'Not Found';
