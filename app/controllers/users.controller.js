@@ -73,14 +73,9 @@ exports.login = async function (req, res) {
 exports.logout = async function (req, res) {
   const userId = req.currentId;
   try {
-    if (!userId){
-      res.statusMessage = 'Unauthorized';
-      res.status(401).send();
-    } else{
-      await userModel.logout(req.currentId);
-      res.statusMessage = 'OK';
-      res.status(200).send();
-    }
+    await userModel.logout(req.currentId);
+    res.statusMessage = 'OK';
+    res.status(200).send();
   }catch(err){
     res.status(500).send();
   }
@@ -172,10 +167,10 @@ exports.getProfilePhoto = async function (req, res) {
 
 exports.deleteProfilePhoto = async function (req, res){
   try{
-    if (!req.currentId){
-      res.statusMessage = 'Unauthorized wrong token';
-      res.status(401).send();
-    }else{
+    // if (!req.currentId){
+    //   res.statusMessage = 'Unauthorized wrong token';
+    //   res.status(401).send();
+    // }else{
       const userFound = await userModel.findUserId(req.params.id, req.currentId);
       const photo = await userModel.getFileName(req.currentId);
       if (req.params.id !== req.currentId){
@@ -197,7 +192,7 @@ exports.deleteProfilePhoto = async function (req, res){
         res.status(200).send();
       }
 
-    }
+    // }
 
   }catch(err){
     res.statusMessage = 'Internal Server Error';

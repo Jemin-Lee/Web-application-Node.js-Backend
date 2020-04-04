@@ -3,19 +3,16 @@ const userModel =  require('../models/users.model');
 exports.setToken = async function (req, res, next) {
   const userToken = req.header('X-Authorization');
   try {
-    // if (!userToken){
-    //   res.statusMessage = "Unauthorized no token";
-    //   res.status(401).send();
-    // }else{
-      const foundUserList = await userModel.findUserToken(userToken);
-      if (foundUserList !== null) {
-        req.currentId = foundUserList[0].user_id.toString();
+      const foundUser = await userModel.findUserToken(userToken);
+      if (foundUser === null) {
+        res.statusMessage = "Unauthorized wrong token";
+        res.status(401).send();
       } else{
-        req.currentId = null;
+        req.currentId = foundUser[0].user_id.toString();
+        next();
       }
-      next();
-    // }
   }catch(err){
-      res.status(500).send();
+    res.statusMessage = 'Internal Server Error';
+    res.status(500).send();
   }
 };
