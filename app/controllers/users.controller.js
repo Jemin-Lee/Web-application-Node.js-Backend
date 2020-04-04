@@ -80,20 +80,12 @@ exports.login = async function (req, res) {
 };
 
 exports.logout = async function (req, res) {
-  const userId = req.currentId;
   try {
-    if (!userId){
-      res.statusMessage = 'Unauthorized wrong token';
-      res.status(401).send();
-      return;
-    }
     await userModel.logout(req.currentId);
     res.statusMessage = 'OK';
     res.status(200).send();
-    return;
   }catch(err){
     res.status(500).send();
-    return;
   }
 };
 
