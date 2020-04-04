@@ -20,24 +20,30 @@ exports.register = async function (req, res) {
     if ((!('email' in req.body)) || (!checkEmail(req.body.email))){
         res.statusMessage = 'Invalid Email';
         res.status(400).send();
+        return;
     }
     if ((!('password' in req.body)) || (!checkEmpty(req.body.password))){
         res.statusMessage = 'Empty password';
         res.status(400).send();
+        return;
     }
     if ((!('name' in req.body)) || (!checkEmpty(req.body.name))) {
         res.statusMessage = 'Empty Name';
         res.status(400).send();
+        return;
     } else {
         try {
             const userId = await userModel.register(req.body);
             res.status(201).json({userId});
+            return;
         }catch(err){
             if (err.sqlMessage && err.sqlMessage.includes('Duplicate entry')){
                 res.statusMessage = 'Username or Email already exists';
                 res.status(400).send();
+                return;
             }else{
                 res.status(500).send();
+                return;
             }
         }
     }
@@ -54,17 +60,21 @@ exports.login = async function (req, res) {
                 const result = await userModel.login(searchedUser.user_id);
                 res.statusMessage='OK';
                 res.status(200).json(result);
+                return;
             }catch(err){
                 res.status(500).send();
+                return;
             }
 
         }else{
             res.statusMessage = 'Wrong Password';
             res.status(400).send();
+            return;
         }
     } else{
         res.statusMessage='Invalid Email';
         res.status(400).send();
+        return;
     }
 
 
@@ -76,8 +86,10 @@ exports.logout = async function (req, res) {
     await userModel.logout(req.currentId);
     res.statusMessage = 'OK';
     res.status(200).send();
+    return;
   }catch(err){
     res.status(500).send();
+    return;
   }
 };
 
@@ -89,12 +101,15 @@ exports.retrieveDetail = async function (req, res) {
     if (!userInfo){
       res.statusMessage = 'Not Found';
       res.status(404).send();
+      return;
     }else{
       res.statusMessage = 'OK';
       res.status(200).json(userInfo);
+      return;
     }
   }catch(err){
     res.status(500).send();
+    return;
   }
 };
 
@@ -154,12 +169,15 @@ exports.getProfilePhoto = async function (req, res) {
     if (!photo){
       res.statusMessage = 'Not Found';
       res.status(404).send();
+      return;
     } else{
       res.statusMessage = 'OK';
       res.status(200).contentType(photo.mimeType).send(photo.fileName);
+      return;
     }
   }catch(err){
     res.status(500).send();
+    return;
   }
 };
 
@@ -167,36 +185,42 @@ exports.getProfilePhoto = async function (req, res) {
 
 exports.deleteProfilePhoto = async function (req, res){
   try{
-    // if (!req.currentId){
-    //   res.statusMessage = 'Unauthorized wrong token';
-    //   res.status(401).send();
-    // }else{
+    if (!req.currentId){
+      res.statusMessage = 'Unauthorized wrong token';
+      res.status(401).send();
+      return;
+    }else{
       const userFound = await userModel.findUserId(req.params.id, req.currentId);
       const photo = await userModel.getFileName(req.currentId);
       if (req.params.id !== req.currentId){
         res.statusMessage = 'Forbidden';
         res.status(403).send();
+        return;
       }
 
       else if (!userFound){
         res.statusMessage = 'Unauthorized';
         res.status(401).send();
+        return;
       }
 
       else if (!photo){
         res.statusMessage = 'Not Found';
         res.status(404).send();
+        return;
       }else{
         await userModel.deleteProfilePhoto(photo, req.currentId);
         res.statusMessage = 'OK';
         res.status(200).send();
+        return;
       }
 
-    // }
+    }
 
   }catch(err){
     res.statusMessage = 'Internal Server Error';
     res.status(500).send();
+    return;
   }
 };
 
@@ -206,17 +230,20 @@ exports.setProfilePhoto = async function (req, res){
   if (!req.currentId){
     res.statusMessage = 'Unauthorized';
     res.status(401).send();
+    return;
   }
 
-  if (req.params.id !== req.currentId){
+  else if (req.params.id !== req.currentId){
     res.statusMessage = 'Forbidden';
     res.status(403).send();
+    return;
   }
-
+  console.log('asdf');
   const userFound = await userModel.findUserId(req.params.id, req.currentId);
   if (!userFound){
     res.statusMessage = 'Not Found';
     res.status(404).send();
+    return;
   }
 
   const imageType = req.header('Content-Type');
@@ -246,20 +273,23 @@ exports.setProfilePhoto = async function (req, res){
         await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
         res.statusMessage = 'OK';
         res.status(200).send();
-
+        return;
       } else {
 
         await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
         res.statusMessage = 'Created';
         res.status(201).send();
+        return;
       }
 
     }catch(err){
       res.statusMessage = 'Internal Server Error';
       res.status(500).send();
+      return;
     }
   }else {
     res.statusMessage = 'Bad Request';
     res.status(400).send();
+    return;
   }
 };
