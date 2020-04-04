@@ -186,14 +186,14 @@ exports.setProfilePhoto = async function (userId, reqBody, fileType){
 };
 
 
-exports.findUserId = async function (reqId, currentId){
+exports.findUserId = async function (reqId){
   const query = `select name, email, city, country from User where user_id = ?`;
 
   try{
     const conn = await db.getPool().getConnection();
-    const [result] = await conn.query(query, currentId);
-
+    const [result] = await conn.query(query, reqId);
     conn.release();
+
     const userData = result[0];
     if (!userData){
       return null;
@@ -218,7 +218,6 @@ exports.deleteProfilePhoto = async function (photo, currentId){
       await fs.unlink('./storage/photos/' + photo);
     }
   }catch(err){
-    errors.logSqlError(err);
     throw err;
   }
 

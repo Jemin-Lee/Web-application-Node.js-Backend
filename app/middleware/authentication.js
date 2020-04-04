@@ -4,7 +4,7 @@ exports.setToken = async function (req, res, next) {
   const userToken = req.header('X-Authorization');
   try {
       const foundUser = await userModel.findUserToken(userToken);
-      if (foundUser === null) {
+      if (!foundUser) {
         req.currentId = null;
       } else{
         req.currentId = foundUser[0].user_id.toString();
@@ -17,23 +17,20 @@ exports.setToken = async function (req, res, next) {
 };
 
 
-exports.loginRequired = async function (req, res, next) {
-    const token = req.header('X-Authorization');
-
+exports.userLoginCheck = async function (req, res, next) {
+    const userToken = req.header('X-Authorization');
     try {
-        const result = await findUserIdByToken(token);
-        if (result === null) {
+        const foundUser = await userModel.findUserToken(userToken);
+        if (!foundUser) {
             res.statusMessage = 'Unauthorized';
-            res.status(401)
-                .send();
+            res.status(401).send();
+            return;
         } else {
-            req.authenticatedUserId = result.user_id.toString();
+            req.currentId = foundUser[0].user_id.toString();
             next();
         }
     } catch (err) {
-        if (!err.hasBeenLogged) console.error(err);
         res.statusMessage = 'Internal Server Error';
-        res.status(500)
-            .send();
+        res.status(500).send();
     }
 };
