@@ -180,9 +180,6 @@ exports.getProfilePhoto = async function (req, res) {
 exports.deleteProfilePhoto = async function (req, res){
   try{
     const userFound = await userModel.findUserId(req.currentId);
-    console.log('1');
-    const photo = await userModel.getFileName(req.currentId);
-    console.log('2');
     if (!userFound){
       res.statusMessage = 'Not Found';
       res.status(404).send();
@@ -194,6 +191,7 @@ exports.deleteProfilePhoto = async function (req, res){
       res.status(403).send();
       return;
     }else{
+      const photo = await userModel.getFileName(req.currentId);
       if(!photo){
         res.statusMessage = 'Not Found';
         res.status(404).send();
@@ -213,8 +211,7 @@ exports.deleteProfilePhoto = async function (req, res){
 
 
 exports.setProfilePhoto = async function (req, res){
-  const userFound = await userModel.findUserId(req.currentId);
-  if (!userFound){
+  if (!await userModel.findUserId(req.params.id)){
     res.statusMessage = 'Not Found';
     res.status(404).send();
     return;
@@ -225,9 +222,8 @@ exports.setProfilePhoto = async function (req, res){
     return;
   }
 
-  const imageType = req.header('Content-Type');
   let imageExtension = null;
-  switch (imageType) {
+  switch (req.header('Content-Type')){
     case 'image/jpeg':
     imageExtension = '.jpg';
     break;
@@ -235,22 +231,22 @@ exports.setProfilePhoto = async function (req, res){
     imageExtension = '.png';
     break;
   }
+
   if (!imageExtension){
     res.statusMessage = 'Bad Request';
     res.status(400).send();
     return;
   }
   try{
-    const photoExist = await userModel.getProfilePhoto(req.currentId);
+    const photoExist = await userModel.getFileName(req.currentId);
+
     if (photoExist) {
-      const photo = await userModel.getFileName(req.currentId);
-      await userModel.deleteProfilePhoto(photo, req.currentId);
+      await userModel.deleteProfilePhoto(photoExist, req.currentId);
       await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
       res.statusMessage = 'OK';
       res.status(200).send();
 
     }else {
-      const photo = await userModel.getFileName(req.currentId);
       await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
       res.statusMessage = 'Created';
       res.status(201).send();

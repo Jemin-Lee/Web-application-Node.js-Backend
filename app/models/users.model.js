@@ -180,7 +180,6 @@ exports.setProfilePhoto = async function (userId, reqBody, fileType){
   }
 };
 
-
 exports.findUserId = async function (reqId){
   const query = `select name, email, city, country from User where user_id = ?`;
 
@@ -208,16 +207,15 @@ exports.deleteProfilePhoto = async function (photo, currentId){
     if (await fs.exists('./storage/photos/' + photo)){
       await fs.unlink('./storage/photos/' + photo);
     }
-    console.log('r')
     const query = `update User set photo_filename = NULL where user_id = ?`;
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, currentId);
     conn.release();
-    console.log('e')
   }catch(err){
     throw err;
   }
 };
+
 
 exports.getFileName = async function (userId){
   const query = `select photo_filename from User where user_id = ?`;
@@ -226,7 +224,6 @@ exports.getFileName = async function (userId){
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, userId);
     const photoName = result[0][0].photo_filename;
-
     return photoName;
   } catch(err){
     throw err;
