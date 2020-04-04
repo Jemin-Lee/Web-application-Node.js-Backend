@@ -232,7 +232,7 @@ exports.setProfilePhoto = async function (req, res){
     break;
   }
 
-  if (!imageExtension){
+  if (imageExtension === null){
     res.statusMessage = 'Bad Request';
     res.status(400).send();
     return;
