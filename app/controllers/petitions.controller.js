@@ -7,7 +7,7 @@ function checkEmpty(input){
         return false;
     }else{
         //input empty || only white-space || null
-        return !(input.length === 0 || !input.trim() || !input);
+        return (input.length === 0 || !input.trim() || !input);
     }
 }
 
@@ -24,18 +24,19 @@ exports.viewPetitions = async function (req, res){
 */
 
 exports.addPetition = async function (req, res) {
-
-
-  if (((!('title' in req.body)) || (!checkEmpty(req.body.title)))){
+  console.log(checkEmpty(req.body.title));
+  if (!('title' in req.body) || checkEmpty(req.body.title)){
     res.statusMessage = "Bad Request title";
     res.status(400).send();
+    return;
   }
 
   let today = new Date();
   let closingDate = new Date(req.body.closingDate)
   if (closingDate < today){
-    res.statusMessage = "Bad Request title";
+    res.statusMessage = "Bad Request Date";
     res.status(400).send();
+    return;
   }
 
   const categoriesDB = await petitionsModel.categories();
@@ -43,6 +44,7 @@ exports.addPetition = async function (req, res) {
   if (!categories.find(element => element.category_id == req.body.categoryId)) {
     res.statusMessage = "Bad Request";
     res.status(400).send();
+    return;
   }
   try {
     const petitionId = await petitionsModel.addPetition(req.body, req.currentId);
