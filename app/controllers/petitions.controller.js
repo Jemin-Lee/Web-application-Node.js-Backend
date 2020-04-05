@@ -24,13 +24,22 @@ exports.viewPetitions = async function (req, res){
 */
 
 exports.addPetition = async function (req, res) {
-  const categoriesDB = await petitionsModel.categories();
-  const categories = categoriesDB[0];
+
+
   if (((!('title' in req.body)) || (!checkEmpty(req.body.title)))){
     res.statusMessage = "Bad Request title";
     res.status(400).send();
   }
 
+  let today = new Date();
+  let closingDate = new Date(req.body.closingDate)
+  if (closingDate < today){
+    res.statusMessage = "Bad Request title";
+    res.status(400).send();
+  }
+
+  const categoriesDB = await petitionsModel.categories();
+  const categories = categoriesDB[0];
   if (!categories.find(element => element.category_id == req.body.categoryId)) {
     res.statusMessage = "Bad Request";
     res.status(400).send();
