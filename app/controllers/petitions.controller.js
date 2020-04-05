@@ -24,19 +24,16 @@ exports.viewPetitions = async function (req, res){
 */
 
 exports.addPetition = async function (req, res) {
-  console.log(checkEmpty(req.body.title));
   if (!('title' in req.body) || checkEmpty(req.body.title)){
     res.statusMessage = "Bad Request title";
     res.status(400).send();
-    return;
   }
 
-  let today = new Date();
-  let closingDate = new Date(req.body.closingDate)
+  const today = new Date();
+  const closingDate = new Date(req.body.closingDate)
   if (closingDate < today){
     res.statusMessage = "Bad Request Date";
     res.status(400).send();
-    return;
   }
 
   const categoriesDB = await petitionsModel.categories();
@@ -44,30 +41,32 @@ exports.addPetition = async function (req, res) {
   if (!categories.find(element => element.category_id == req.body.categoryId)) {
     res.statusMessage = "Bad Request";
     res.status(400).send();
-    return;
+  }else{
+    try {
+      const petitionId = await petitionsModel.addPetition(req.body, req.currentId);
+      res.statusMessage = 'Created';
+      res.status(201).json({petitionId});
+    } catch(err){
+      res.statusMessage = 'Internal Server Error';
+      res.status(500).send();
+    }
   }
-  try {
-    const petitionId = await petitionsModel.addPetition(req.body, req.currentId);
-    res.statusMessage = 'Created';
-    res.status(201).json({petitionId});
-  } catch(err){
-    res.statusMessage = 'Internal Server Error';
-    res.status(500).send();
-  }
+
 };
 
 
 exports.viewPetition = async function (req, res) {
   try {
     const petition = await petitionsModel.viewPetition(req.params.id);
-    if (!petition){
-      res.statusMessage = 'Not Found';
-      res.status(404).send();
-    } else {
+    if (petition){
       res.statusMessage = 'OK';
       res.status(200).json(petition);
+    } else {
+      res.statusMessage = 'Not Found';
+      res.status(404).send();
     }
   }catch(err){
+    res.statusMessage = 'Internal Server Error';
     res.status(500).send();
   }
 }
@@ -82,18 +81,12 @@ exports.changePetition = async function (req, res){
     res.statusMessage = "Bad Request";
     res.status(400).send();
   }
-  else if (!(petitionFound.authorId == req.currentId)){
+  else if (petitionFound.authorId !== req.currentId){
 
     res.statusMessage = 'Forbidden';
     res.status(403).send();
 
   }
-
-  else if (!req.currentId){
-    res.statusMessage = 'Unauthorized';
-    res.status(401).send();
-  }
-
   else if (!petitionFound){
     res.statusMessage = 'Not Found';
     res.status(404).send();
