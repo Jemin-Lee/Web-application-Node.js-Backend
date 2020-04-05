@@ -31,8 +31,8 @@ exports.addPetition = async function(reqBody, userId){
 
 exports.viewPetition = async function(petitionId){
   try {
-    const query = `select title, User.name, description, author_id, city, country, created_date, closing_date from Petition join User on Petition.author_id = User.user_id where petition_id = ?`;
-    const query2 = `select Category.name from Petition join Category on Category.category_id = Petition.category_id where petition_id = ?`;
+    const query = `select petition_id, title, User.name, description, author_id, city, country, created_date, closing_date from Petition join User on Petition.author_id = User.user_id where petition_id = ?`;
+    const query2 = `select name from Category join Petition on Petition.category_id = Category.category_id where petition_id = ?`;
     const query3 = `select COUNT (*) as "sig" FROM Signature WHERE petition_id = ?`
 
     const conn = await db.getPool().getConnection();
@@ -51,7 +51,7 @@ exports.viewPetition = async function(petitionId){
       return null;
     }else{
       return {
-        'petitionId': petitionId,
+        'petitionId': result[0].petition_id,
         'title': result[0].title,
         'category': result2[0].name,
         'authorName': result[0].name,
