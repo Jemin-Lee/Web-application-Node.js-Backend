@@ -47,7 +47,7 @@ exports.viewPetition = async function(petitionId){
     conn2.release();
     conn3.release();
 
-    if (!result || !result2 || !result3){
+    if ((result.length < 1) || (result2.length < 1)){
       return null;
     }else{
       return {
