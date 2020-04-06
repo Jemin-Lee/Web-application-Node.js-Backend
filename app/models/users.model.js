@@ -105,7 +105,7 @@ exports.retrieveDetail = async function (reqId, currentId){
 };
 
 
-exports.update =async function (reqBody, userId) {
+exports.update = async function (reqBody, userId) {
   const query = `update User set ? where user_id = ?`;
   try {
 
@@ -132,16 +132,26 @@ exports.findPassword = async function (userId){
     }
 };
 
-exports.getProfilePhoto = async function (userId){
+
+
+
+exports.getPhotoName = async function (userId){
   const query = `select photo_filename from User where user_id = ?`;
-  try {
+  try{
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, userId);
     const photoName = result[0][0].photo_filename;
+    return photoName;
+  }catch(err){
+    return null;
+    throw err;
+  }
+};
 
-
-    if (await fs.exists('./storage/photos/'+ photoName)){
-      const file = await fs.readFile('./storage/photos/'+ photoName);
+exports.readPhoto = async function (fileName){
+  try{
+    if (await fs.exists('./storage/photos/' + fileName)){
+      const file = await fs.readFile('./storage/photos/' + fileName);
 
       let mimeType = "application/octet-stream";
       if (photoName.endsWith('jpeg')||photoName.endsWith('jpg')){
@@ -159,23 +169,50 @@ exports.getProfilePhoto = async function (userId){
     }else{
       return null;
     }
+};
+
+
+exports.setProfilePhoto = async function (userId, reqBody, fileType){
+
+  const query = `update User set photo_filename = ? where user_id = ?`;
+  try {
+    await writePhoto(reqBody, fileType);
+    const conn = await db.getPool().getConnection()
+    await conn.query(query, [imageName, userId]);
+    conn.release();
   }catch(err){
-    return null;
+    throw err;
+  }
+};
+
+exports.writePhoto = async function(reqBody, fileType){
+  const imageName = randomtoken.generate(16) + fileType;
+  try{
+    await fs.writeFile('./storage/photos/' + imageName, reqBody);
+    return imageName;
+  }catch(err){
     throw err;
   }
 };
 
 
-exports.setProfilePhoto = async function (userId, reqBody, fileType){
-  const imageName = randomtoken.generate(16) + fileType;
-  const query = `update User set photo_filename = ? where user_id = ?`;
-  try {
-    await fs.writeFile('./storage/photos/' + imageName, reqBody);
-
-    const conn = await db.getPool().getConnection()
-    await conn.query(query, [imageName, userId]);
+exports.deleteProfilePhoto = async function (photo, currentId){
+  try{
+    await userModel.unlinkPhoto(photo);
+    const query = `update User set photo_filename = NULL where user_id = ?`;
+    const conn = await db.getPool().getConnection();
+    const result = await conn.query(query, currentId);
     conn.release();
+  }catch(err){
+    throw err;
+  }
+};
 
+exports.unlinkPhoto = async function (fileName){
+  try{
+    if (await fs.exists('./storage/photos/' + fileName)){
+      await fs.unlink('./storage/photos/' + fileName);
+    }
   }catch(err){
     throw err;
   }
@@ -198,35 +235,6 @@ exports.findUserId = async function (reqId){
 
   }catch(err){
     return null;
-    throw err;
-  }
-};
-
-
-exports.deleteProfilePhoto = async function (photo, currentId){
-  try{
-    if (await fs.exists('./storage/photos/' + photo)){
-      await fs.unlink('./storage/photos/' + photo);
-    }
-    const query = `update User set photo_filename = NULL where user_id = ?`;
-    const conn = await db.getPool().getConnection();
-    const result = await conn.query(query, currentId);
-    conn.release();
-  }catch(err){
-    throw err;
-  }
-};
-
-
-exports.getFileName = async function (userId){
-  const query = `select photo_filename from User where user_id = ?`;
-
-  try {
-    const conn = await db.getPool().getConnection();
-    const result = await conn.query(query, userId);
-    const photoName = result[0][0].photo_filename;
-    return photoName;
-  } catch(err){
     throw err;
   }
 };

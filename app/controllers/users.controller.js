@@ -164,13 +164,15 @@ exports.changeDetails = async function (req, res){
 };
 
 
+
 exports.getProfilePhoto = async function (req, res) {
   try {
-    const photo = await userModel.getProfilePhoto(req.params.id);
-    if (!photo){
+    const photoName = await userModel.getPhotoName(req.params.id);
+    if (!photoName){
       res.statusMessage = 'Not Found';
       res.status(404).send();
     } else{
+      const readPhoto = await userModel.readPhoto(photoName);
       res.statusMessage = 'OK';
       res.status(200).contentType(photo.mimeType).send(photo.fileName);
     }
@@ -179,6 +181,8 @@ exports.getProfilePhoto = async function (req, res) {
     res.status(500).send();
   }
 };
+
+
 
 
 
@@ -195,12 +199,12 @@ exports.deleteProfilePhoto = async function (req, res){
       res.status(403).send();
       return;
     }else{
-      const photo = await userModel.getFileName(req.currentId);
-      if(photo === null){
+      const photoExist = await userModel.getPhotoName(req.currentId);
+      if(!photoExist){
         res.statusMessage = 'Not Found';
         res.status(404).send();
       }else{
-        await userModel.deleteProfilePhoto(photo, req.currentId);
+        await userModel.deleteProfilePhoto(photoExist, req.currentId);
         res.statusMessage = 'OK';
         res.status(200).send();
       }
@@ -230,19 +234,21 @@ exports.setProfilePhoto = async function (req, res){
     case 'image/jpeg':
     imageExtension = '.jpg';
     break;
+    case 'image/gif':
+    imageExtension = '.gif';
+    break;
     case 'image/png':
     imageExtension = '.png';
     break;
   }
-
   if (imageExtension === null){
     res.statusMessage = 'Bad Request';
     res.status(400).send();
     return;
   }
-  try{
-    const photoExist = await userModel.getFileName(req.currentId);
 
+  try{
+    const photoExist = await userModel.getPhotoName(req.currentId);
     if (photoExist) {
       await userModel.deleteProfilePhoto(photoExist, req.currentId);
       await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
@@ -253,7 +259,6 @@ exports.setProfilePhoto = async function (req, res){
       await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
       res.statusMessage = 'Created';
       res.status(201).send();
-
     }
   }catch(err){
     res.statusMessage = 'Internal Server Error';
