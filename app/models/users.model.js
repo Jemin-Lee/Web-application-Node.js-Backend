@@ -6,7 +6,8 @@ const snakeCaseKeys = require('snakecase-keys');
 
 exports.register = async function (user) {
     const query = `INSERT INTO User (name, email, password, city, country) VALUES (?, ?, ?, ?, ?)`;
-    const userData = [user.name, user.email, await passwords.hash(user.password), user.city, user.country];
+    const password = await passwords.hash(user.password);
+    const userData = [user.name, user.email, password, user.city, user.country];
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query(query, userData);
     conn.release();
@@ -18,6 +19,7 @@ exports.register = async function (user) {
 login
 */
 exports.login = async function (userId){
+  try{
     const token = randomtoken.generate(32);
     const query = `update User set auth_token = ? where user_id = ?`;
 
@@ -29,7 +31,12 @@ exports.login = async function (userId){
       'userId': userId,
       'token': token
     };
+  }catch(err){
+    throw err;
+  }
+
 };
+
 exports.findUser = async function (email){
     try {
         const query = `select user_id, password from User where email = ?`;
@@ -49,7 +56,6 @@ logout
 exports.logout = async function (userId){
   const query = `update User set auth_token = null where user_id = ?`
   try {
-
     const conn = await db.getPool().getConnection();
     await conn.query(query, userId);
     conn.release();
@@ -57,6 +63,7 @@ exports.logout = async function (userId){
     throw err;
   }
 };
+
 exports.findUserToken = async function (userToken){
     const query = `select user_id from User where auth_token = ?`;
     if (!userToken){
@@ -84,7 +91,7 @@ exports.retrieveDetail = async function (reqId, currentId){
     const [result] = await conn.query(query, reqId);
     conn.release();
     const userData = result[0];
-    if (!currentId){
+    if ((currentId !== reqId) || !currentId){
       return {
         'name': userData.name,
         'city': userData.city,
@@ -97,18 +104,13 @@ exports.retrieveDetail = async function (reqId, currentId){
   }
 };
 
-/*
+
 exports.update =async function (reqBody, userId) {
   const query = `update User set ? where user_id = ?`;
-  console.log(snakeCaseKeys(reqBody));
-  console.log(userId);
-  const query2 = `update User set password = ?  where user_id = ?`
   try {
-    if (reqBody.password){
-      const hashPass = await passwords.hash(reqBody.password);
-      const conn2 = await db.getPool().getConnection();
-      await conn2.query(query2, [hashPass, userId]);
 
+    if (reqBody.password){
+      reqBody.password = await passwords.hash(reqBody.password);
     }
     const conn = await db.getPool().getConnection();
     await conn.query(query, [snakeCaseKeys(reqBody),userId]);
@@ -129,7 +131,6 @@ exports.findPassword = async function (userId){
         return null;
     }
 };
-*/
 
 exports.getProfilePhoto = async function (userId){
   const query = `select photo_filename from User where user_id = ?`;
