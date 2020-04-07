@@ -19,7 +19,7 @@ module.exports = function (app) {
 
 
     app.route(app.rootUrl + '/users/:id/photo')
-    .get(usersController.getProfilePhoto)
+    //.get(usersController.getProfilePhoto)
     .put(authentication.userLoginCheck, usersController.putProfilePhoto);
 
 
