@@ -186,7 +186,7 @@ exports.getProfilePhoto = async function (req, res) {
 
 
 
-
+/*
 exports.deleteProfilePhoto = async function (req, res){
   try{
     if (!await userModel.findUserId(req.params.id)){
@@ -218,7 +218,7 @@ exports.deleteProfilePhoto = async function (req, res){
     res.status(500).send();
   }
 };
-
+*/
 
 
 exports.putProfilePhoto = async function (req, res){
