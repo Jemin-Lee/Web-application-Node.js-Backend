@@ -116,6 +116,7 @@ exports.postPetition = async function (req, res) {
   if (closingDate < today){
     res.statusMessage = "Bad Request Date";
     res.status(400).send();
+    return;
   }
 
   const categoriesDB = await petitionsModel.categories();
@@ -123,6 +124,7 @@ exports.postPetition = async function (req, res) {
   if (!categories.find(element => element.category_id == req.body.categoryId)) {
     res.statusMessage = "Bad Request";
     res.status(400).send();
+    return;
   }else{
     try {
       const petitionId = await petitionsModel.addPetition(req.body, req.currentId);
@@ -139,13 +141,13 @@ exports.postPetition = async function (req, res) {
 
 exports.getCategories = async function (req, res){
   try{
-    const categoriesDB = await petitionsModel.categories();
-    const categories = categoriesDB[0].map(category => camelcaseKeys(category));
+    const categoriesRaw = await petitionsModel.categories();
+    const categories = categoriesRaw[0].map(category => camelcaseKeys(category));
+
     res.statusMessage = 'OK';
     res.status(200).json(categories);
 
   }catch(err){
-    if (!err.hasBeenLogged) console.error(err);
     throw err;
     res.statusMessage = 'Internal Server Error';
     res.status(500).send();

@@ -12,9 +12,7 @@ module.exports = function (app) {
     .post(authentication.userLoginCheck, usersController.logout);
 
     app.route(app.rootUrl + '/users/:id')
-    .get(authentication.setToken, usersController.retrieveDetail);
-
-    app.route(app.rootUrl + '/users/:id')
+    .get(authentication.setToken, usersController.retrieveDetail)
     .patch(authentication.userLoginCheck, usersController.changeDetails);
 
 

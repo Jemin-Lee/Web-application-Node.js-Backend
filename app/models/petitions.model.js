@@ -17,14 +17,8 @@ exports.getPetition = async function(petitionId){
     const result2 = (await conn.query(query2, petitionId))[0];
     const result3 = (await conn.query(query3, petitionId))[0];
 
-    conn.release();
-    conn2.release();
-    conn3.release();
 
-
-    if ((result.length < 1) || (result2.length < 1) || (result3.length < 1)){
-      return null;
-    }else{
+    if (result || result2 || result3){
       return {
         'petitionId': result[0].petition_id,
         'title': result[0].title,
@@ -38,6 +32,9 @@ exports.getPetition = async function(petitionId){
         'createdDate': result[0].created_date,
         'closingDate': result[0].closing_date
       };
+
+    }else{
+      return null;
     }
   }catch(err){
     throw err;
@@ -62,7 +59,14 @@ exports.addPetition = async function(reqBody, userId){
   try {
     const query = `insert into Petition (title, description, author_id, category_id, created_date, closing_date) values (?,?,?,?,?,?)`;
     let today = new Date();
-    const petitionData = [reqBody.title, reqBody.description, userId, reqBody.categoryId, today, reqBody.closingDate];
+    const petitionData = [
+      reqBody.title,
+      reqBody.description,
+      userId,
+      reqBody.categoryId,
+      today,
+      reqBody.closingDate
+    ];
     const conn = await db.getPool().getConnection();
     const [result] = await conn.query(query, petitionData);
     conn.release();
