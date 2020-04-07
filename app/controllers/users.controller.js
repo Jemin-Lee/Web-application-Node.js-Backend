@@ -240,9 +240,9 @@ exports.putProfilePhoto = async function (req, res){
     case 'image/jpeg':
     imageExtension = '.jpg';
     break;
-    case 'image/gif':
-    imageExtension = '.gif';
-    break;
+    // case 'image/gif':
+    // imageExtension = '.gif';
+    // break;
     case 'image/png':
     imageExtension = '.png';
     break;
