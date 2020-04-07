@@ -174,7 +174,7 @@ exports.readPhoto = async function (fileName){
 };
 
 
-exports.setProfilePhoto = async function (userId, imageName){
+exports.putProfilePhoto = async function (userId, imageName){
 
   const query = `update User set photo_filename = ? where user_id = ?`;
   try {

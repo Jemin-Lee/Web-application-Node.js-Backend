@@ -208,7 +208,7 @@ exports.deleteProfilePhoto = async function (req, res){
       }else{
         await Promise.all([
           await userModel.unlinkPhoto(photoExist),
-          await userModel.setProfilePhoto(req.currentId, null);
+          await userModel.putProfilePhoto(req.currentId, null);
         ]);
         res.statusMessage = 'OK';
         res.status(200).send();
@@ -257,14 +257,14 @@ exports.putProfilePhoto = async function (req, res){
     const photoExist = await userModel.getPhotoName(req.currentId);
     if (!photoExist) {
       const imageName = await userModel.writePhoto(req.body, imageExtension);
-      await userModel.setProfilePhoto(req.currentId, imageName);
+      await userModel.putProfilePhoto(req.currentId, imageName);
       res.statusMessage = 'Created';
       res.status(201).send();
       return;
     }else {
       await userModel.unlinkPhoto(photoExist);
       const imageName = await userModel.writePhoto(req.body, imageExtension);
-      await userModel.setProfilePhoto(req.currentId, imageName);
+      await userModel.putProfilePhoto(req.currentId, imageName);
       res.statusMessage = 'OK';
       res.status(200).send();
       return;
