@@ -206,10 +206,8 @@ exports.deleteProfilePhoto = async function (req, res){
         res.status(404).send();
         return;
       }else{
-        await Promise.all([
-          await userModel.unlinkPhoto(photoExist),
-          await userModel.putProfilePhoto(req.currentId, null)
-        ]);
+        await userModel.unlinkPhoto(photoExist);
+        await userModel.deleteProfilePhoto(req.currentId, photoExist);
         res.statusMessage = 'OK';
         res.status(200).send();
         return;
