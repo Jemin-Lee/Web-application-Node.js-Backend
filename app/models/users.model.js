@@ -114,6 +114,7 @@ exports.update = async function (reqBody, userId) {
     }
     const conn = await db.getPool().getConnection();
     await conn.query(query, [snakeCaseKeys(reqBody),userId]);
+    conn.release();
   }catch(err){
     throw err;
   }
@@ -140,6 +141,7 @@ exports.getPhotoName = async function (userId){
   try{
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, userId);
+    conn.release();
     const photoName = result[0][0].photo_filename;
     return photoName;
   }catch(err){

@@ -14,10 +14,12 @@ exports.signPetition = async function (currentId, petitionId){
   const query = `select signed_date from Signature where signatory_id = ?`;
   const conn = await db.getPool().getConnection();
   const signedDate = await conn.query(query, currentId);
+  conn.release();
 
   if (!signedDate[0][0]){
     const query2 = `insert into Signature (signatory_id, petition_id, signed_date) values (?,?,?)`;
     const conn2 = await db.getPool().getConnection();
+    conn2.release();
     let today = new Date();
 
     try{
@@ -37,13 +39,16 @@ exports.unsignPetition = async function (currentId, petitionId){
   const query = `select signed_date from Signature where signatory_id = ?`;
   const conn = await db.getPool().getConnection();
   const signedDate = await conn.query(query, currentId);
+  conn.release();
 
   if (signedDate[0][0]){
     const query2 = `delete from Signature where signatory_id = ? and petition_id = ?`;
-    const conn2 = await db.getPool().getConnection();
+
 
     try{
+      const conn2 = await db.getPool().getConnection();
       await conn2.query(query2, [currentId, petitionId]);
+      conn2.release();
       return 1;
     }catch(err){
       throw err;

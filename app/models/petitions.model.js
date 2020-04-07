@@ -17,6 +17,10 @@ exports.getPetition = async function(petitionId){
     const result2 = (await conn.query(query2, petitionId))[0];
     const result3 = (await conn.query(query3, petitionId))[0];
 
+    conn.release();
+    conn2.release();
+    conn3.release();
+
 
     if (result || result2 || result3){
       return {
@@ -83,6 +87,7 @@ exports.changePetition = async function (reqBody, petitionId){
     const query = `update Petition set ? where petition_id = ?`;
     const conn = await db.getPool().getConnection();
     await conn.query(query, [snakeCaseKeys(reqBody),petitionId]);
+    conn.release();
   }catch(err){
     throw err;
   }
@@ -105,6 +110,7 @@ exports.getPetitionPhoto = async function (petitionId){
   try {
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, petitionId);
+    conn.release();
     const photoName = result[0][0].photo_filename;
 
     if (await fs.exists('./storage/photos/'+photoName)){
