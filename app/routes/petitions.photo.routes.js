@@ -3,5 +3,6 @@ const authentication = require('../middleware/authentication');
 
 module.exports = function (app) {
   app.route(app.rootUrl + '/petitions/:id/photo')
-  .get(petitionsController.getPetitionPhoto);
+  .get(petitionsController.getPetitionPhoto)
+  .put(authentication.userLoginCheck, petitionsController.putPetitionPhoto);
 };

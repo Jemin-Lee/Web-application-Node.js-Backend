@@ -1,5 +1,6 @@
 const db = require('../../config/db');
 const snakeCaseKeys = require('snakecase-keys');
+const randomtoken = require('rand-token');
 const fs = require('mz/fs');
 
 const petitionsController = require('../controllers/petitions.controller');
@@ -106,36 +107,94 @@ exports.deletePetition = async function (petitionId){
 };
 
 
-exports.getPetitionPhoto = async function (petitionId){
+exports.getPhotoName = async function (petitionId){
   const query = `select photo_filename from Petition where petition_id = ?`;
-  try {
+  try{
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, petitionId);
     conn.release();
     const photoName = result[0][0].photo_filename;
+    return photoName;
+  }catch(err){
+    return null;
+    throw err;
+  }
+};
 
-    if (await fs.exists('./storage/photos/'+photoName)){
-      const file = await fs.readFile('./storage/photos/'+photoName);
+exports.readPhoto = async function (fileName){
+  try{
+    if (await fs.exists('./storage/photos/' + fileName)){
+      const file = await fs.readFile('./storage/photos/' + fileName);
 
-      let mimeType = "image/?";
-      if (photoName.endsWith('jpg')||photoName.endsWith('jpeg')){
+      let mimeType = "application/octet-stream";
+      if (fileName.endsWith('jpeg')||fileName.endsWith('jpg')){
         mimeType = "image/jpeg";
-      } else if(photoName.endsWith('png')){
+      } else if(fileName.endsWith('png')){
         mimeType = "image/png";
-      } else if (photoName.endsWith('gif')){
+      } else if (fileName.endsWith('gif')){
         mimeType = "image/gif";
       }
-
       return {
         'fileName': file,
         'mimeType': mimeType
       };
-
     }else{
       return null;
     }
+  }catch(err){
+    throw err;
+  }
+};
+
+exports.putProfilePhoto = async function (petitionId, imageName){
+
+  const query = `update Petition set photo_filename = ? where petition_id = ?`;
+  try {
+    const conn = await db.getPool().getConnection()
+    await conn.query(query, [imageName, petitionId]);
+    conn.release();
+  }catch(err){
+    throw err;
+  }
+};
+
+exports.writePhoto = async function(reqBody, fileType){
+  const imageName = randomtoken.generate(16) + fileType;
+  try{
+    await fs.writeFile('./storage/photos/' + imageName, reqBody);
+    return imageName;
+  }catch(err){
+    throw err;
+  }
+};
+
+exports.unlinkPhoto = async function (fileName){
+  try{
+    if (await fs.exists('./storage/photos/' + fileName)){
+      await fs.unlink('./storage/photos/' + fileName);
+    }
+  }catch(err){
+    throw err;
+  }
+};
+
+exports.findPetitionId = async function (reqId){
+  const query = `select title, author_id from Petition where petition_id = ?`;
+
+  try{
+    const conn = await db.getPool().getConnection();
+    const [result] = await conn.query(query, reqId);
+    conn.release();
+
+    const petitionData = result[0];
+    if (petitionData.length < 1){
+      return null;
+    }else{
+      return petitionData;
+    }
 
   }catch(err){
-    throw(err);
+    return null;
+    throw err;
   }
 };

@@ -1,6 +1,7 @@
 const petitionsModel = require('../models/petitions.model');
 const passwords = require('../service/password');
 const camelcaseKeys = require('camelcase-keys');
+const fs = require('mz/fs');
 
 function checkEmpty(input){
     if (!input){
@@ -167,15 +168,75 @@ exports.getCategories = async function (req, res){
 
 exports.getPetitionPhoto = async function (req, res){
   try {
-    const photo = await petitionsModel.getPetitionPhoto(req.params.id);
-    if (!photo){
+    console.log(req.params.id);
+    const photoName = await petitionsModel.getPhotoName(req.params.id);
+    if (!photoName){
       res.statusMessage = 'Not Found';
       res.status(404).send();
     } else{
+      console.log(photoName);
+      const readPhoto = await petitionsModel.readPhoto(photoName);
       res.statusMessage = 'OK';
-      res.status(200).contentType(photo.mimeType).send(photo.fileName);
+      res.status(200).contentType(readPhoto.mimeType).send(readPhoto.fileName);
     }
   }catch(err){
+    res.statusMessage = 'Internal Server Error';
     res.status(500).send();
   }
+};
+
+exports.putPetitionPhoto = async function (req, res){
+  const petitionData = await petitionsModel.findPetitionId(req.params.id)
+  if (!petitionData){
+    res.statusMessage = 'Not Found';
+    res.status(404).send();
+    return;
+  }
+  if (!(petitionData.author_id == req.currentId)){
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+    return;
+  }
+
+  let imageExtension = null;
+  switch (req.header('Content-Type')){
+    case 'image/jpeg':
+    imageExtension = '.jpg';
+    break;
+    // case 'image/gif':
+    // imageExtension = '.gif';
+    // break;
+    case 'image/png':
+    imageExtension = '.png';
+    break;
+  }
+  if (imageExtension === null){
+    res.statusMessage = 'Bad Request';
+    res.status(400).send();
+    return;
+  }
+
+  try{
+    const photoExist = await petitionsModel.getPhotoName(req.params.id);
+
+    if (!photoExist) {
+      const imageName = await petitionsModel.writePhoto(req.body, imageExtension);
+      await petitionsModel.putProfilePhoto(req.params.id, imageName);
+      res.statusMessage = 'Created';
+      res.status(201).send();
+      return;
+    }else {
+      await petitionsModel.unlinkPhoto(photoExist);
+      const imageName = await petitionsModel.writePhoto(req.body, imageExtension);
+      await petitionsModel.putProfilePhoto(req.currentId, imageName);
+      res.statusMessage = 'OK';
+      res.status(200).send();
+      return;
+    }
+  }catch(err){
+    res.statusMessage = 'Internal Server Error';
+    res.status(500).send();
+    return;
+  }
+
 };
