@@ -12,52 +12,9 @@ function checkEmpty(input){
 }
 
 
-/*list all petitions come back later
-
-
-exports.viewPetitions = async function (req, res){
-
-
-};
-
-
-*/
-
-exports.addPetition = async function (req, res) {
-  if (!('title' in req.body) || checkEmpty(req.body.title)){
-    res.statusMessage = "Bad Request title";
-    res.status(400).send();
-  }
-
-  const today = new Date();
-  const closingDate = new Date(req.body.closingDate)
-  if (closingDate < today){
-    res.statusMessage = "Bad Request Date";
-    res.status(400).send();
-  }
-
-  const categoriesDB = await petitionsModel.categories();
-  const categories = categoriesDB[0];
-  if (!categories.find(element => element.category_id == req.body.categoryId)) {
-    res.statusMessage = "Bad Request";
-    res.status(400).send();
-  }else{
-    try {
-      const petitionId = await petitionsModel.addPetition(req.body, req.currentId);
-      res.statusMessage = 'Created';
-      res.status(201).json({petitionId});
-    } catch(err){
-      res.statusMessage = 'Internal Server Error';
-      res.status(500).send();
-    }
-  }
-
-};
-
-
-exports.viewPetition = async function (req, res) {
+exports.getPetition = async function (req, res) {
   try {
-    const petition = await petitionsModel.viewPetition(req.params.id);
+    const petition = await petitionsModel.getPetition(req.params.id);
     if (petition){
       res.statusMessage = 'OK';
       res.status(200).json(petition);
@@ -72,7 +29,7 @@ exports.viewPetition = async function (req, res) {
 }
 
 
-exports.changePetition = async function (req, res){
+exports.patchPetition = async function (req, res){
   const petitionFound = await petitionsModel.viewPetition(req.params.id);
   const categoriesDB = await petitionsModel.categories();
   const categories = categoriesDB[0];
@@ -103,6 +60,7 @@ exports.changePetition = async function (req, res){
       }
   }
 };
+
 
 
 exports.deletePetition = async function (req, res) {
@@ -136,7 +94,50 @@ exports.deletePetition = async function (req, res) {
 };
 
 
-exports.viewCategories = async function (req, res){
+/*list all petitions come back later
+
+
+exports.viewPetitions = async function (req, res){
+
+
+};
+
+
+*/
+
+exports.postPetition = async function (req, res) {
+  if (!('title' in req.body) || checkEmpty(req.body.title)){
+    res.statusMessage = "Bad Request title";
+    res.status(400).send();
+  }
+
+  const today = new Date();
+  const closingDate = new Date(req.body.closingDate)
+  if (closingDate < today){
+    res.statusMessage = "Bad Request Date";
+    res.status(400).send();
+  }
+
+  const categoriesDB = await petitionsModel.categories();
+  const categories = categoriesDB[0];
+  if (!categories.find(element => element.category_id == req.body.categoryId)) {
+    res.statusMessage = "Bad Request";
+    res.status(400).send();
+  }else{
+    try {
+      const petitionId = await petitionsModel.addPetition(req.body, req.currentId);
+      res.statusMessage = 'Created';
+      res.status(201).json({petitionId});
+    } catch(err){
+      res.statusMessage = 'Internal Server Error';
+      res.status(500).send();
+    }
+  }
+
+};
+
+
+exports.getCategories = async function (req, res){
   try{
     const categoriesDB = await petitionsModel.categories();
     const categories = categoriesDB[0].map(category => camelcaseKeys(category));
@@ -152,7 +153,7 @@ exports.viewCategories = async function (req, res){
 };
 
 
-exports.viewPetitionPhoto = async function (req, res){
+exports.getPetitionPhoto = async function (req, res){
   try {
     const photo = await petitionsModel.getPetitionPhoto(req.params.id);
     if (!photo){
