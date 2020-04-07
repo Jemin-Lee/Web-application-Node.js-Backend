@@ -20,8 +20,7 @@ module.exports = function (app) {
 
     app.route(app.rootUrl + '/users/:id/photo')
     .get(usersController.getProfilePhoto)
-    .put(authentication.userLoginCheck, usersController.setProfilePhoto);
-
-    //.delete(authentication.userLoginCheck, usersController.deleteProfilePhoto)
+    .put(authentication.userLoginCheck, usersController.putProfilePhoto)
+    .delete(authentication.userLoginCheck, usersController.deleteProfilePhoto)
 
 };

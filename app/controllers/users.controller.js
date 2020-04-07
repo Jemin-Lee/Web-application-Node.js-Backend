@@ -1,5 +1,6 @@
 const userModel =  require('../models/users.model');
 const passwords = require('../service/password');
+const randomtoken = require('rand-token');
 
 
 function checkEmail(email){
@@ -174,7 +175,7 @@ exports.getProfilePhoto = async function (req, res) {
     } else{
       const readPhoto = await userModel.readPhoto(photoName);
       res.statusMessage = 'OK';
-      res.status(200).contentType(photo.mimeType).send(photo.fileName);
+      res.status(200).contentType(readPhoto.mimeType).send(readPhoto.fileName);
     }
   }catch(err){
     res.statusMessage = 'Internal Server Error';
@@ -204,6 +205,7 @@ exports.deleteProfilePhoto = async function (req, res){
         res.statusMessage = 'Not Found';
         res.status(404).send();
       }else{
+        await userModel.unlinkPhoto(photoExist);
         await userModel.deleteProfilePhoto(photoExist, req.currentId);
         res.statusMessage = 'OK';
         res.status(200).send();
@@ -217,7 +219,7 @@ exports.deleteProfilePhoto = async function (req, res){
 
 
 
-exports.setProfilePhoto = async function (req, res){
+exports.putProfilePhoto = async function (req, res){
   if (!await userModel.findUserId(req.params.id)){
     res.statusMessage = 'Not Found';
     res.status(404).send();
@@ -249,16 +251,20 @@ exports.setProfilePhoto = async function (req, res){
 
   try{
     const photoExist = await userModel.getPhotoName(req.currentId);
-    if (photoExist) {
-      await userModel.deleteProfilePhoto(photoExist, req.currentId);
-      await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
-      res.statusMessage = 'OK';
-      res.status(200).send();
-
-    }else {
-      await userModel.setProfilePhoto(req.currentId, req.body, imageExtension);
+    if (!photoExist) {
+      const imageName = await userModel.writePhoto(req.body, imageExtension);
+      await userModel.setProfilePhoto(req.currentId, imageName);
       res.statusMessage = 'Created';
       res.status(201).send();
+      return;
+    }else {
+      await userModel.unlinkPhoto(photoExist);
+      await userModel.deleteProfilePhoto(photoExist, req.currentId);
+      const imageName = await userModel.writePhoto(req.body, imageExtension);
+      await userModel.setProfilePhoto(req.currentId, imageName);
+      res.statusMessage = 'OK';
+      res.status(200).send();
+      return;
     }
   }catch(err){
     res.statusMessage = 'Internal Server Error';

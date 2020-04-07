@@ -154,14 +154,13 @@ exports.readPhoto = async function (fileName){
       const file = await fs.readFile('./storage/photos/' + fileName);
 
       let mimeType = "application/octet-stream";
-      if (photoName.endsWith('jpeg')||photoName.endsWith('jpg')){
+      if (fileName.endsWith('jpeg')||fileName.endsWith('jpg')){
         mimeType = "image/jpeg";
-      } else if(photoName.endsWith('png')){
+      } else if(fileName.endsWith('png')){
         mimeType = "image/png";
-      } else if (photoName.endsWith('gif')){
+      } else if (fileName.endsWith('gif')){
         mimeType = "image/gif";
       }
-
       return {
         'fileName': file,
         'mimeType': mimeType
@@ -175,11 +174,10 @@ exports.readPhoto = async function (fileName){
 };
 
 
-exports.setProfilePhoto = async function (userId, reqBody, fileType){
+exports.setProfilePhoto = async function (userId, imageName){
 
   const query = `update User set photo_filename = ? where user_id = ?`;
   try {
-    await writePhoto(reqBody, fileType);
     const conn = await db.getPool().getConnection()
     await conn.query(query, [imageName, userId]);
     conn.release();
@@ -194,6 +192,7 @@ exports.writePhoto = async function(reqBody, fileType){
     await fs.writeFile('./storage/photos/' + imageName, reqBody);
     return imageName;
   }catch(err){
+    errors.logSqlError(err);
     throw err;
   }
 };
@@ -201,7 +200,6 @@ exports.writePhoto = async function(reqBody, fileType){
 
 exports.deleteProfilePhoto = async function (photo, currentId){
   try{
-    await userModel.unlinkPhoto(photo);
     const query = `update User set photo_filename = NULL where user_id = ?`;
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, currentId);
