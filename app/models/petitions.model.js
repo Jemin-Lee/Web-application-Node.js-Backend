@@ -85,7 +85,6 @@ exports.postPetition = async function(reqBody, userId){
 
 exports.patchPetition = async function (reqBody, petitionId){
   try{
-    console.log([petitionsController.toUnderscoreCase(reqBody), petitionId]);
     const query = `update Petition set ? where petition_id = ?`;
     const conn = await db.getPool().getConnection();
     await conn.query(query, [snakeCaseKeys(reqBody), petitionId]);

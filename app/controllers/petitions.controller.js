@@ -2,11 +2,6 @@ const petitionsModel = require('../models/petitions.model');
 const passwords = require('../service/password');
 const camelcaseKeys = require('camelcase-keys');
 
-const humps = require('humps');
-exports.toUnderscoreCase = function (object) {
-    return humps.decamelizeKeys(object);
-};
-
 function checkEmpty(input){
     if (!input){
         return false;
@@ -54,6 +49,8 @@ exports.patchPetition = async function (req, res){
 
 
   if (petitionFound.authorId == req.currentId){
+    console.log(petitionFound);
+    console.log(req.params.id);
     try {
           await petitionsModel.patchPetition(req.body, req.params.id);
           res.statusMessage = 'OK';
@@ -87,15 +84,8 @@ exports.deletePetition = async function (req, res) {
     return;
   }
 
-  if (petitionFound.authorId !== req.currentId){
-    res.statusMessage = 'Forbidden';
-    res.status(403).send();
-    return;
-  }
 
-
-
-  else{
+  if (petitionFound.authorId == req.currentId){
     try{
       await petitionsModel.deletePetition(req.params.id);
       res.statusMessage = 'OK';
@@ -106,6 +96,10 @@ exports.deletePetition = async function (req, res) {
       res.status(500).send();
       return;
     }
+  }else{
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+    return;
   }
 };
 
