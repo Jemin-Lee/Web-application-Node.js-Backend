@@ -142,6 +142,7 @@ exports.getPhotoName = async function (userId){
     const conn = await db.getPool().getConnection();
     const result = await conn.query(query, userId);
     conn.release();
+
     const photoName = result[0][0].photo_filename;
     return photoName;
   }catch(err){
@@ -198,17 +199,6 @@ exports.writePhoto = async function(reqBody, fileType){
   }
 };
 
-
-exports.deleteProfilePhoto = async function (photo, currentId){
-  try{
-    const query = `update User set photo_filename = NULL where user_id = ?`;
-    const conn = await db.getPool().getConnection();
-    const result = await conn.query(query, currentId);
-    conn.release();
-  }catch(err){
-    throw err;
-  }
-};
 
 exports.unlinkPhoto = async function (fileName){
   try{
