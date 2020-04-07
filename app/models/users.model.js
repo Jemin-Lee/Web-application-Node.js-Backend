@@ -194,7 +194,6 @@ exports.writePhoto = async function(reqBody, fileType){
     await fs.writeFile('./storage/photos/' + imageName, reqBody);
     return imageName;
   }catch(err){
-    errors.logSqlError(err);
     throw err;
   }
 };

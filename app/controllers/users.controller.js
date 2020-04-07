@@ -186,7 +186,7 @@ exports.getProfilePhoto = async function (req, res) {
 
 
 
-/*
+
 exports.deleteProfilePhoto = async function (req, res){
   try{
     if (!await userModel.findUserId(req.params.id)){
@@ -216,9 +216,10 @@ exports.deleteProfilePhoto = async function (req, res){
   }catch(err){
     res.statusMessage = 'Internal Server Error';
     res.status(500).send();
+    return;
   }
 };
-*/
+
 
 
 exports.putProfilePhoto = async function (req, res){
@@ -270,6 +271,7 @@ exports.putProfilePhoto = async function (req, res){
   }catch(err){
     res.statusMessage = 'Internal Server Error';
     res.status(500).send();
+    return;
   }
 
 };
