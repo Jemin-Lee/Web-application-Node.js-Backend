@@ -169,6 +169,9 @@ exports.readPhoto = async function (fileName){
     }else{
       return null;
     }
+  }catch(err){
+    throw err;
+  }
 };
 
 
