@@ -2,6 +2,11 @@ const petitionsModel = require('../models/petitions.model');
 const passwords = require('../service/password');
 const camelcaseKeys = require('camelcase-keys');
 
+const humps = require('humps');
+exports.toUnderscoreCase = function (object) {
+    return humps.decamelizeKeys(object);
+};
+
 function checkEmpty(input){
     if (!input){
         return false;
@@ -30,34 +35,39 @@ exports.getPetition = async function (req, res) {
 
 
 exports.patchPetition = async function (req, res){
-  const petitionFound = await petitionsModel.viewPetition(req.params.id);
+  const petitionFound = await petitionsModel.getPetition(req.params.id);
   const categoriesDB = await petitionsModel.categories();
   const categories = categoriesDB[0];
-
-  if (!categories.find(element => element.category_id == req.body.categoryId)) {
-    res.statusMessage = "Bad Request";
-    res.status(400).send();
-  }
-  else if (petitionFound.authorId !== req.currentId){
-
-    res.statusMessage = 'Forbidden';
-    res.status(403).send();
-
-  }
-  else if (!petitionFound){
+  if (!petitionFound){
     res.statusMessage = 'Not Found';
     res.status(404).send();
+    return;
   }
 
-  else{
+  if ('categoryId' in req.body){
+    if (!categories.find(element => element.category_id == req.body.categoryId)) {
+      res.statusMessage = "Bad Request";
+      res.status(400).send();
+      return;
+    }
+  }
+
+
+  if (petitionFound.authorId == req.currentId){
     try {
-          await petitionsModel.changePetition(req.body, req.params.id);
+          await petitionsModel.patchPetition(req.body, req.params.id);
           res.statusMessage = 'OK';
           res.status(200).send();
+          return;
       } catch (err) {
           res.statusMessage = 'Internal Server Error';
           res.status(500).send();
       }
+  }
+  else{
+    res.statusMessage = 'Forbidden';
+    res.status(403).send();
+    return;
   }
 };
 
@@ -65,30 +75,36 @@ exports.patchPetition = async function (req, res){
 
 exports.deletePetition = async function (req, res) {
   const petitionFound = await petitionsModel.getPetition(req.params.id);
+  if (!petitionFound){
+    res.statusMessage = 'Not Found';
+    res.status(404).send();
+    return;
+  }
 
   if (!req.currentId){
     res.statusMessage = 'Unauthorized';
     res.status(401).send();
+    return;
   }
 
-  else if (!(petitionFound.authorId == req.currentId)){
+  if (petitionFound.authorId !== req.currentId){
     res.statusMessage = 'Forbidden';
     res.status(403).send();
+    return;
   }
 
-  else if (!petitionFound){
-    res.statusMessage = 'Not Found';
-    res.status(404).send();
-  }
+
 
   else{
     try{
       await petitionsModel.deletePetition(req.params.id);
       res.statusMessage = 'OK';
       res.status(200).send();
+      return;
     }catch(err){
       res.statusMessage = 'Internal Server Error';
       res.status(500).send();
+      return;
     }
   }
 };
@@ -127,7 +143,7 @@ exports.postPetition = async function (req, res) {
     return;
   }else{
     try {
-      const petitionId = await petitionsModel.addPetition(req.body, req.currentId);
+      const petitionId = await petitionsModel.postPetition(req.body, req.currentId);
       res.statusMessage = 'Created';
       res.status(201).json({petitionId});
     } catch(err){

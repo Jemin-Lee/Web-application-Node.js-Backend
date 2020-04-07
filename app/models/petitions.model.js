@@ -2,6 +2,8 @@ const db = require('../../config/db');
 const snakeCaseKeys = require('snakecase-keys');
 const fs = require('mz/fs');
 
+const petitionsController = require('../controllers/petitions.controller');
+
 exports.getPetition = async function(petitionId){
 
     const query = `select petition_id, title, User.name, description, author_id, city, country, created_date, closing_date from Petition join User on Petition.author_id = User.user_id where petition_id = ?`;
@@ -21,8 +23,10 @@ exports.getPetition = async function(petitionId){
     conn2.release();
     conn3.release();
 
+    if ((result.length < 1) || (result2.length < 1)){
+      return null;
 
-    if (result || result2 || result3){
+    }else{
       return {
         'petitionId': result[0].petition_id,
         'title': result[0].title,
@@ -36,9 +40,6 @@ exports.getPetition = async function(petitionId){
         'createdDate': result[0].created_date,
         'closingDate': result[0].closing_date
       };
-
-    }else{
-      return null;
     }
   }catch(err){
     throw err;
@@ -59,8 +60,9 @@ exports.categories = async function() {
   }
 };
 
-exports.addPetition = async function(reqBody, userId){
+exports.postPetition = async function(reqBody, userId){
   try {
+    console.log(userId);
     const query = `insert into Petition (title, description, author_id, category_id, created_date, closing_date) values (?,?,?,?,?,?)`;
     let today = new Date();
     const petitionData = [
@@ -81,12 +83,12 @@ exports.addPetition = async function(reqBody, userId){
 };
 
 
-
-exports.changePetition = async function (reqBody, petitionId){
+exports.patchPetition = async function (reqBody, petitionId){
   try{
+    console.log([petitionsController.toUnderscoreCase(reqBody), petitionId]);
     const query = `update Petition set ? where petition_id = ?`;
     const conn = await db.getPool().getConnection();
-    await conn.query(query, [snakeCaseKeys(reqBody),petitionId]);
+    await conn.query(query, [snakeCaseKeys(reqBody), petitionId]);
     conn.release();
   }catch(err){
     throw err;
