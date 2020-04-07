@@ -198,7 +198,7 @@ exports.writePhoto = async function(reqBody, fileType){
   }
 };
 
-/*
+
 exports.deleteProfilePhoto = async function (photo, currentId){
   try{
     const query = `update User set photo_filename = NULL where user_id = ?`;
@@ -209,7 +209,6 @@ exports.deleteProfilePhoto = async function (photo, currentId){
     throw err;
   }
 };
-*/
 
 exports.unlinkPhoto = async function (fileName){
   try{

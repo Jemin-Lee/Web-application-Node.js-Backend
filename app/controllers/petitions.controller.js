@@ -64,7 +64,7 @@ exports.patchPetition = async function (req, res){
 
 
 exports.deletePetition = async function (req, res) {
-  const petitionFound = await petitionsModel.viewPetition(req.params.id);
+  const petitionFound = await petitionsModel.getPetition(req.params.id);
 
   if (!req.currentId){
     res.statusMessage = 'Unauthorized';
