@@ -163,13 +163,17 @@ exports.getCategories = async function (req, res){
 
 exports.getPetitionPhoto = async function (req, res){
   try {
-    console.log(req.params.id);
     const photoName = await petitionsModel.getPhotoName(req.params.id);
     if (!photoName){
       res.statusMessage = 'Not Found';
       res.status(404).send();
-    } else{
-      console.log(photoName);
+    }
+    const petition = await petitionsModel.getPetition(req.params.id);
+    if (!petition){
+      res.statusMessage = 'Not Found';
+      res.status(404).send();
+      return;
+    }else{
       const readPhoto = await petitionsModel.readPhoto(photoName);
       res.statusMessage = 'OK';
       res.status(200).contentType(readPhoto.mimeType).send(readPhoto.fileName);
@@ -205,9 +209,6 @@ exports.putPetitionPhoto = async function (req, res){
     case 'image/jpeg':
     imageExtension = '.jpg';
     break;
-    // case 'image/gif':
-    // imageExtension = '.gif';
-    // break;
     case 'image/png':
     imageExtension = '.png';
     break;
@@ -220,7 +221,6 @@ exports.putPetitionPhoto = async function (req, res){
 
   try{
     const photoExist = await petitionsModel.getPhotoName(req.params.id);
-
     if (!photoExist) {
       const imageName = await petitionsModel.writePhoto(req.body, imageExtension);
       await petitionsModel.putProfilePhoto(req.params.id, imageName);
@@ -229,9 +229,9 @@ exports.putPetitionPhoto = async function (req, res){
       return;
     }else {
       await petitionsModel.unlinkPhoto(photoExist);
-      await petitionsModel.putProfilePhoto(req.currentId, null);
+      await petitionsModel.putProfilePhoto(req.params.id, null);
       const imageName = await petitionsModel.writePhoto(req.body, imageExtension);
-      await petitionsModel.putProfilePhoto(req.currentId, imageName);
+      await petitionsModel.putProfilePhoto(req.params.id, imageName);
       res.statusMessage = 'OK';
       res.status(200).send();
       return;

@@ -37,13 +37,13 @@ exports.postSignature = async function (req, res){
       return;
     }else{
       const signed = await signaturesModel.signedPetition(req.currentId);
-      if (signed.find(element => element.petition_id == req.params.id)){
+      if (!signed.find(element => element.petition_id == req.params.id)){
         await signaturesModel.postSignature(req.currentId, req.params.id);
         res.statusMessage = 'Created';
         res.status(201).send();
         return;
       }else{
-        res.statusMessage = 'Forbidden not signed';
+        res.statusMessage = 'Forbidden already signed';
         res.status(403).send();
         return;
       }
@@ -72,7 +72,7 @@ exports.deleteSignature = async function (req, res) {
         return;
 
       }else{
-        res.statusMessage = 'Forbidden already signed';
+        res.statusMessage = 'Forbidden not signed';
         res.status(403).send();
         return;
       }
