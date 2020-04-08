@@ -38,8 +38,8 @@ exports.postSignature = async function (req, res){
     }else{
       const result = await signaturesModel.postSignature(req.currentId, req.params.id);
       if (result === 1){
-        res.statusMessage = 'OK';
-        res.status(200).send();
+        res.statusMessage = 'Created';
+        res.status(201).send();
         return;
       }else{
         res.statusMessage = 'Forbidden';

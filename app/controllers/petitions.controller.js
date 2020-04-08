@@ -39,7 +39,6 @@ exports.patchPetition = async function (req, res){
     res.status(404).send();
     return;
   }
-
   if ('categoryId' in req.body){
     if (!categories.find(element => element.category_id == req.body.categoryId)) {
       res.statusMessage = "Bad Request";
@@ -47,11 +46,7 @@ exports.patchPetition = async function (req, res){
       return;
     }
   }
-
-
   if (petitionFound.authorId == req.currentId){
-    console.log(petitionFound);
-    console.log(req.params.id);
     try {
           await petitionsModel.patchPetition(req.body, req.params.id);
           res.statusMessage = 'OK';
