@@ -10,49 +10,38 @@ exports.getSignatures = async function (petitionId){
   return users[0];
 };
 
-exports.postSignature = async function (currentId, petitionId){
-  const query = `select signed_date from Signature where signatory_id = ?`;
-  const conn = await db.getPool().getConnection();
-  const signedDate = await conn.query(query, currentId);
-  conn.release();
+exports.signedPetition =  async function (currentId){
+  const query = `select petition_id from Signature where signatory_id = ?`;
+  try{
+    const conn = await db.getPool().getConnection();
+    const signedPetitions = await conn.query(query, currentId);
+    conn.release();
+    return signedPetitions[0];
+  }catch(err){
+    throw err;
+  }
+};
 
-  if (!signedDate[0][0]){
-    const query2 = `insert into Signature (signatory_id, petition_id, signed_date) values (?,?,?)`;
-    const conn2 = await db.getPool().getConnection();
+exports.postSignature = async function (currentId, petitionId){
+    const query = `insert into Signature (signatory_id, petition_id, signed_date) values (?,?,?)`;
     let today = new Date();
     try{
-      await conn2.query(query2, [currentId, petitionId, today]);
-      conn2.release();
-      return 1;
+      const conn = await db.getPool().getConnection();
+      await conn.query(query, [currentId, petitionId, today]);
+      conn.release();
     }catch(err){
       throw err;
     }
-  }else{
-    return null;
-  }
-
 };
 
 
 exports.deleteSignature = async function (currentId, petitionId){
-  const query = `select signed_date from Signature where signatory_id = ?`;
-  const conn = await db.getPool().getConnection();
-  const signedDate = await conn.query(query, currentId);
-  conn.release();
-
-  if (signedDate[0][0]){
-    const query2 = `delete from Signature where signatory_id = ? and petition_id = ?`;
-
-
-    try{
-      const conn2 = await db.getPool().getConnection();
-      await conn2.query(query2, [currentId, petitionId]);
-      conn2.release();
-      return 1;
-    }catch(err){
-      throw err;
-    }
-  }else{
-    return null;
+  const query = `delete from Signature where signatory_id = ? and petition_id = ?`;
+  try{
+    const conn = await db.getPool().getConnection();
+    await conn.query(query, [currentId, petitionId]);
+    conn.release();
+  }catch(err){
+    throw err;
   }
 };

@@ -63,7 +63,6 @@ exports.categories = async function() {
 
 exports.postPetition = async function(reqBody, userId){
   try {
-    console.log(userId);
     const query = `insert into Petition (title, description, author_id, category_id, created_date, closing_date) values (?,?,?,?,?,?)`;
     let today = new Date();
     const petitionData = [
