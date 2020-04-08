@@ -186,6 +186,13 @@ exports.getPetitionPhoto = async function (req, res){
 };
 
 exports.putPetitionPhoto = async function (req, res){
+  const petition = await petitionsModel.getPetition(req.params.id);
+  if (!petition){
+    res.statusMessage = 'Not Found';
+    res.status(404).send();
+    return;
+  }
+
   const petitionData = await petitionsModel.findPetitionId(req.params.id)
   if (!petitionData){
     res.statusMessage = 'Not Found';
@@ -227,6 +234,7 @@ exports.putPetitionPhoto = async function (req, res){
       return;
     }else {
       await petitionsModel.unlinkPhoto(photoExist);
+      await petitionsModel.putProfilePhoto(req.currentId, null);
       const imageName = await petitionsModel.writePhoto(req.body, imageExtension);
       await petitionsModel.putProfilePhoto(req.currentId, imageName);
       res.statusMessage = 'OK';

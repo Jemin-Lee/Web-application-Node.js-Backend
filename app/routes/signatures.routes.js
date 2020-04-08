@@ -3,7 +3,7 @@ const authentication = require('../middleware/authentication');
 
 module.exports = function (app) {
   app.route(app.rootUrl + '/petitions/:id/signatures')
-  .get(signaturesController.viewSignatures)
-  .post(authentication.setToken, signaturesController.signPetition)
-  .delete(authentication.setToken, signaturesController.unsignPetition);
+  .get(signaturesController.getSignatures)
+  .post(authentication.userLoginCheck, signaturesController.postSignature)
+  .delete(authentication.userLoginCheck, signaturesController.deleteSignature);
 };
